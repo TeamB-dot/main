@@ -12,7 +12,7 @@ end
 
 -- queue_on_teleport Patch (100% Safe)
 do
-    local payload = "if not getgenv().BlackAir_Running then getgenv().BlackAir_Running=true; loadstring(game:HttpGet('https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/loader.lua'))() end"
+    local payload = "if not getgenv().BlackAir_Running then getgenv().BlackAir_Running=true; loadstring(game:HttpGet('https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/main/loader.lua'))() end"
 
     if syn and syn.queue_on_teleport then
         syn.queue_on_teleport(payload)
