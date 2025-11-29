@@ -12,11 +12,16 @@ local function debug(m) print("[BlackAir] "..m) end
 
 -- CAR SYSTEM
 function core.findCar()
+    local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+
     for _, v in ipairs(workspace.Vehicles:GetChildren()) do
         if v.Name ~= "Orange" then
             local f = v:FindFirstChild("InfoFolder")
-            if f and f.Owner and tostring(f.Owner.Value):lower()==player.Name:lower() then
-                return v
+            if f then
+                local owner = f:FindFirstChild("Owner")
+                if owner and owner.Value and tostring(owner.Value):lower() == player.Name:lower() then
+                    return v
+                end
             end
         end
     end
