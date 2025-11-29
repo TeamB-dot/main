@@ -2,7 +2,7 @@
 if getgenv().BlackAir_Running then return end
 getgenv().BlackAir_Running = true
 
-local BASE = "https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/modules/"
+local BASE = "https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/main/modules/"
 
 local function LoadModule(name)
     local url = BASE .. name .. ".lua"
