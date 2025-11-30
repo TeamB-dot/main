@@ -42,7 +42,7 @@ Tab:CreateToggle({
 Tab:CreateButton({
     Name = "Start Trashcan Farm",
     Callback = function()
-        loadstring(game:HttpGet(TRASH_SCRIPT_LINK))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/main"))()
     end
 })
 
