@@ -1,146 +1,21 @@
-if not getgenv then return end
-getgenv().autoexec_enabled = getgenv().autoexec_enabled or false
-
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
-local LocalPlayer = Players.LocalPlayer
-
-local START_SCRIPT = "https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/Farm"   -- ⭐ DEIN Auto-Trashcan Script
-
-local function dbg(msg)
-    print("[BlackAir] " .. msg)
-end
-
--- =====================================================
--- ⭐ QUEUE ON TELEPORT SYSTEM
--- =====================================================
-local function queueStartScript()
-    local q = queue_on_teleport or queue_on_teleport_internal or syn and syn.queue_on_teleport
-    if not q then return end
-
-    q([[
-        repeat task.wait() until game:IsLoaded()
-        loadstring(game:HttpGet("]] .. START_SCRIPT .. [[", true))()
-    ]])
-
-    dbg("Queued Auto-Farm for next server.")
-end
-
--- =====================================================
--- GUI + Toggle
--- =====================================================
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
 local Window = Rayfield:CreateWindow({
-   Name = "BlackAir Auto Farm",
+   Name = "BlackAir Loader",
    LoadingTitle = "BlackAir Auto Farm",
    LoadingSubtitle = "by BlackAir Team",
-   Theme = "Default",
-
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = "BlackAir",
-      FileName = "sigma"
-   },
-
-   Discord = {
-      Enabled = false,
-      Invite = "noinvitelink",
-      RememberJoins = true
-   },
-
-   KeySystem = false
 })
 
-local Tab = Window:CreateTab("Settings", 4483362458)
+local Tab = Window:CreateTab("Loader", 4483362458)
 
-local toggleRef = nil
-
-toggleRef = Tab:CreateToggle({
-    Name = "AutoExec",
-    CurrentValue = getgenv().autoexec_enabled,
-    Flag = "ToggleAutoExec",
-    Callback = function(val)
-        getgenv().autoexec_enabled = val
-
-        local ok, err = pcall(function()
-            writefile("BlackAir/autoexec_status.txt", tostring(val))
-        end)
-
-        if val then
-            queueStartScript()
-        end
-
-        if not ok then dbg("Error while saving: " .. err) end
-    end,
+Tab:CreateParagraph({
+   Title = "Info",
+   Content = "Press START to open the Auto Farm panel."
 })
-
--- =====================================================
--- Server Hop Button
--- =====================================================
 
 Tab:CreateButton({
-    Name = "Server Hop",
+    Name = "Start",
     Callback = function()
-        dbg("Server Hop...")
-        queueStartScript()
-
-        local placeId, jobId = game.PlaceId, game.JobId
-        local reqf = syn and syn.request or http_request or request
-        local servers = {}
-
-        local ok, res = pcall(function()
-            return HttpService:JSONDecode(reqf({
-                Url = ("https://games.roblox.com/v1/games/%d/servers/Public?limit=100"):format(placeId),
-                Method = "GET"
-            }).Body)
-        end)
-
-        if ok and res and res.data then
-            for _, s in ipairs(res.data) do
-                if s.playing < s.maxPlayers and s.id ~= jobId then
-                    table.insert(servers, s.id)
-                end
-            end
-        end
-
-        if #servers > 0 then
-            TeleportService:TeleportToPlaceInstance(placeId, servers[math.random(#servers)], LocalPlayer)
-        end
-    end
+        loadstring(game:HttpGet("YOUR_AUTO_FARM_GUI_LINK"))()
+    end,
 })
-
--- =====================================================
--- AutoExec Laden
--- =====================================================
-
-local function loadStatus()
-    local ok, content = pcall(function()
-        return readfile("BlackAir/autoexec_status.txt")
-    end)
-
-    if ok and content then
-        local value = (content:lower() == "true")
-        getgenv().autoexec_enabled = value
-        dbg("AutoExec loaded: " .. tostring(value))
-
-        if toggleRef then
-            pcall(function()
-                toggleRef:Set(value)
-            end)
-        end
-    end
-end
-
-loadStatus()
-
--- =====================================================
--- AUTOEXEC-DIREKTSTART
--- =====================================================
-
-if getgenv().autoexec_enabled then
-    dbg("AutoExec is running immediately…")
-    queueStartScript()
-    loadstring(game:HttpGet(START_SCRIPT))()
-end
