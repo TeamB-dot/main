@@ -1,35 +1,40 @@
-if not getgenv().BlackAir then getgenv().BlackAir = {} end
+local TRASH_LINK = "https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/main"
 
-local TeleportService = game:GetService("TeleportService")
+-- AutoExec speichern
+local function setQueued(val)
+    pcall(function()
+        writefile("blackair_queue.txt", tostring(val))
+    end)
+end
+
+local function serverHop()
+    if getgenv().BlackAir and getgenv().BlackAir.AutoExec then
+        setQueued(true)
+    end
+    game:GetService("TeleportService"):Teleport(game.PlaceId)
+end
+
+-- ============ ORIGINAL TRASH CAN SYSTEM ============
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-
-local q = queue_on_teleport or queue_on_teleport_internal or (syn and syn.queue_on_teleport)
-local TRASH_SCRIPT_LINK = "https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/main"
-
-local function queueNextServer()
-    if getgenv().BlackAir.AutoExec and q then
-        q([[
-            repeat task.wait() until game:IsLoaded()
-            loadstring(game:HttpGet("]] .. TRASH_SCRIPT_LINK .. [[", true))()
-        ]])
-    end
-end
-
-local function safeTeleport(pos)
-    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-    local hrp = char:WaitForChild("HumanoidRootPart")
-
-    hrp.CFrame = CFrame.new(pos + Vector3.new(0,3,0))
-    task.wait(0.25)
-end
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 
 local folder = workspace:WaitForChild("Map")
     :WaitForChild("Deko")
     :WaitForChild("Muelleimer")
     :WaitForChild("Folder")
 
-local function getNextContainer()
+local currentIndex = 0
+
+local function safeTeleport(pos)
+    if Character and Character:FindFirstChild("HumanoidRootPart") then
+        Character.HumanoidRootPart.CFrame = CFrame.new(pos + Vector3.new(0,3,0))
+        task.wait(0.25)
+    end
+end
+
+local function getNextRawContainer()
     for _, obj in ipairs(folder:GetChildren()) do
         if obj:IsA("Model") and obj.Name == "ContainerTonneS" then
             return obj
@@ -38,30 +43,49 @@ local function getNextContainer()
     return nil
 end
 
-while true do
-    local trash = getNextContainer()
+local function processNextContainer()
+    local container = getNextRawContainer()
+    if not container then
+        return false
+    end
 
-    if not trash then
-        print("Keine Trashcans mehr – Server Hop!")
-        queueNextServer()
-        TeleportService:Teleport(game.PlaceId)
+    currentIndex += 1
+    container.Name = "ContainerTonneS" .. currentIndex
+
+    local tpPos = nil
+    if container.PrimaryPart then
+        tpPos = container.PrimaryPart.Position
+    else
+        local basePart = container:FindFirstChildWhichIsA("BasePart")
+        if basePart then
+            tpPos = basePart.Position
+        end
+    end
+
+    if not tpPos then
+        warn("[Warn] Kein TP-Punkt:", container.Name)
+        return true
+    end
+
+    safeTeleport(tpPos)
+
+    local giveLoot = container:FindFirstChild("GiveLoot")
+    if giveLoot and giveLoot:IsA("RemoteEvent") then
+        giveLoot:FireServer()
+        print("[Loot] Von", container.Name)
+    else
+        warn("[Warn] Kein GiveLoot Remote:", container.Name)
+    end
+
+    return true
+end
+
+while true do
+    local hasMore = processNextContainer()
+    if not hasMore then
+        print("Alle Container fertig → Auto Server Hop")
+        serverHop()
         break
     end
-
-    local pos = trash.PrimaryPart and trash.PrimaryPart.Position
-        or trash:FindFirstChildWhichIsA("BasePart") and trash:FindFirstChildWhichIsA("BasePart").Position
-
-    if pos then
-        safeTeleport(pos)
-    end
-
-    -- Loot
-    local loot = trash:FindFirstChild("GiveLoot")
-    if loot then
-        loot:FireServer()
-    end
-
-    trash.Name = "Used_" .. trash.Name
-
     task.wait(0.05)
 end
