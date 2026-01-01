@@ -328,7 +328,7 @@ end)
 CreateElement("ImageButton", function(ImageID)
 	local Image = Create("ImageButton", {
 		Image = ImageID,
-		BackgroundTransparency = 0
+		BackgroundTransparency = 1
 	})
 	return Image
 end)
