@@ -315,7 +315,7 @@ end)
 CreateElement("Image", function(ImageID)
 	local ImageNew = Create("ImageLabel", {
 		Image = ImageID,
-		BackgroundTransparency = 0
+		BackgroundTransparency = 1
 	})
 
 	if GetIcon(ImageID) ~= nil then
