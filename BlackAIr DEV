@@ -1,0 +1,3434 @@
+print("[BlackAirDEBUG]: Game Load : Emden")
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+function createLabel(tab, text, info)
+    return tab:CreateLabel(text or "Label", info or "info")
+end
+
+local blackAir = {
+    -- === Grundfarben ===
+    TextColor = Color3.fromRGB(235, 235, 235), -- klares Weiß
+    Background = Color3.fromRGB(10, 10, 10), -- echtes Schwarz
+    Topbar = Color3.fromRGB(14, 14, 14),
+    Shadow = Color3.fromRGB(0, 0, 0),
+
+    -- === Akzent (minimal, kein Glow) ===
+    Accent = Color3.fromRGB(255, 255, 255), -- pure white
+    AccentSecondary = Color3.fromRGB(180, 180, 180),
+    Glow = Color3.fromRGB(255, 255, 255), -- nur falls gebraucht
+
+    -- === Notifications ===
+    NotificationBackground = Color3.fromRGB(16, 16, 16),
+    NotificationActionsBackground = Color3.fromRGB(22, 22, 22),
+
+    -- === Tabs ===
+    TabBackground = Color3.fromRGB(12, 12, 12),
+    TabStroke = Color3.fromRGB(40, 40, 40),
+    TabBackgroundSelected = Color3.fromRGB(20, 20, 20),
+    TabTextColor = Color3.fromRGB(150, 150, 150),
+    SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+
+    -- === UI-Elemente ===
+    ElementBackground = Color3.fromRGB(14, 14, 14),
+    ElementBackgroundHover = Color3.fromRGB(20, 20, 20),
+    SecondaryElementBackground = Color3.fromRGB(18, 18, 18),
+
+    ElementStroke = Color3.fromRGB(45, 45, 45),
+    SecondaryElementStroke = Color3.fromRGB(30, 30, 30),
+
+    -- === Slider ===
+    SliderBackground = Color3.fromRGB(18, 18, 18),
+    SliderProgress = Color3.fromRGB(255, 255, 255),
+    SliderStroke = Color3.fromRGB(70, 70, 70),
+
+    -- === Toggles ===
+    ToggleBackground = Color3.fromRGB(18, 18, 18),
+    ToggleEnabled = Color3.fromRGB(255, 255, 255),
+    ToggleDisabled = Color3.fromRGB(70, 70, 70),
+    ToggleEnabledStroke = Color3.fromRGB(255, 255, 255),
+    ToggleDisabledStroke = Color3.fromRGB(90, 90, 90),
+    ToggleEnabledOuterStroke = Color3.fromRGB(10, 10, 10),
+    ToggleDisabledOuterStroke = Color3.fromRGB(12, 12, 12),
+
+    -- === Dropdowns ===
+    DropdownSelected = Color3.fromRGB(20, 20, 20),
+    DropdownUnselected = Color3.fromRGB(14, 14, 14),
+
+    -- === Inputs ===
+    InputBackground = Color3.fromRGB(16, 16, 16),
+    InputStroke = Color3.fromRGB(50, 50, 50),
+    PlaceholderColor = Color3.fromRGB(120, 120, 120),
+}
+
+local player = game.Players.LocalPlayer
+local isWatching = false
+
+function watchForPlayerCar()
+    if isWatching then
+        warn("[BlackAir]: Already watching for player car. Preventing double start.")
+        return
+    end
+    isWatching = true
+
+    coroutine.wrap(function()
+        local currentVehicle = nil
+
+        while true do
+            -- Wenn kein Auto aktuell da oder Auto nicht mehr im Workspace
+            if not currentVehicle or not currentVehicle.Parent then
+                -- Suche neues Auto
+                for _, vehicle in pairs(workspace.Vehicles:GetChildren()) do
+                    if vehicle.Name == "Orange" then
+                        continue
+                    end
+
+                    local infoFolder = vehicle:FindFirstChild("InfoFolder")
+                    if infoFolder and infoFolder:FindFirstChild("Owner") then
+                        local owner = infoFolder.Owner
+                        local ownerName = tostring(owner.Value)
+
+                        if string.lower(ownerName) == string.lower(player.Name) then
+                            print("[BlackAir]: Car Found For Player: " .. vehicle.Name)
+                            currentVehicle = vehicle
+
+                            -- Jetzt Animation starten, aber nur wenn noch nicht animiert
+                            if not currentVehicle:FindFirstChild("BlackAirAnimation") then
+                                animatePlates(currentVehicle)
+                            end
+                            break
+                        end
+                    end
+                end
+            end
+
+            task.wait(1)
+        end
+    end)()
+end
+
+function animatePlates(vehicle)
+    -- Markieren dass dieses Fahrzeug animiert wird
+    local animFlag = Instance.new("BoolValue")
+    animFlag.Name = "BlackAirAnimation"
+    animFlag.Parent = vehicle
+
+    local plates = {}
+
+    -- Plates sammeln
+    local bodyPlate = vehicle:FindFirstChild("Body") and vehicle.Body:FindFirstChild("LicensePlate")
+    if bodyPlate then table.insert(plates, bodyPlate) end
+
+    local trunkPlate = vehicle:FindFirstChild("Body")
+        and vehicle.Body:FindFirstChild("MovableParts")
+        and vehicle.Body.MovableParts:FindFirstChild("Trunk")
+        and vehicle.Body.MovableParts.Trunk:FindFirstChild("MovableModel")
+        and vehicle.Body.MovableParts.Trunk.MovableModel:FindFirstChild("LicensePlate")
+    if trunkPlate then table.insert(plates, trunkPlate) end
+
+    for _, plate in ipairs(plates) do
+        local surface = plate:FindFirstChild("PlateSurface")
+        if surface then
+            surface.Texture.ImageColor3 = Color3.fromRGB(0, 0, 0)
+
+            local letters1 = surface:FindFirstChild("Letters1")
+            local letters3 = surface:FindFirstChild("Letters3")
+            if letters1 then letters1:Destroy() end
+            if letters3 then letters3:Destroy() end
+
+local letters2 = surface:FindFirstChild("Letters2")
+if letters2 then
+    -- 🔥 Alle Children von Letters2 löschen
+    for _, child in ipairs(letters2:GetChildren()) do
+        child:Destroy()
+    end
+
+    -- 🎨 Styling
+    letters2.TextColor3 = Color3.fromRGB(255, 255, 255)
+    letters2.TextWrapped = false
+    letters2.TextStrokeTransparency = 0.5
+    letters2.TextTransparency = 0
+
+    -- 📍 Text exakt zentrieren (wie im Bild)
+    letters2.TextXAlignment = Enum.TextXAlignment.Center
+    letters2.TextYAlignment = Enum.TextYAlignment.Center
+
+    -- Optional, aber empfohlen
+    letters2.AnchorPoint = Vector2.new(0.5, 0.5)
+    letters2.Position = UDim2.new(0.5, 0, 0.5, 0)
+
+    coroutine.wrap(function()
+        local text = "BlackAir"
+        while vehicle and vehicle.Parent and animFlag.Parent == vehicle do
+            for i = 1, #text do
+                if not vehicle or not vehicle.Parent or animFlag.Parent ~= vehicle then return end
+                letters2.Text = string.sub(text, 1, i)
+                task.wait(0.1)
+            end
+
+            local growSteps = 10
+            for step = 1, growSteps do
+                if not vehicle or not vehicle.Parent or animFlag.Parent ~= vehicle then return end
+                local scale = 1 + (step / growSteps) * 0.15
+                letters2.TextScaled = true
+                letters2.Size = UDim2.new(scale, 0, scale, 0)
+                task.wait(0.05)
+            end
+
+            for step = growSteps, 0, -1 do
+                if not vehicle or not vehicle.Parent or animFlag.Parent ~= vehicle then return end
+                local scale = 1 + (step / growSteps) * 0.15
+                letters2.TextScaled = true
+                letters2.Size = UDim2.new(scale, 0, scale, 0)
+                task.wait(0.05)
+            end
+
+            task.wait(1)
+
+            for i = #text, 1, -1 do
+                if not vehicle or not vehicle.Parent or animFlag.Parent ~= vehicle then return end
+                letters2.Text = string.sub(text, 1, i)
+                task.wait(0.07)
+            end
+
+            task.wait(0.5)
+                    end
+                end)()
+            end
+        end
+    end
+end
+
+
+-- Starten
+watchForPlayerCar()
+-- Funktion, um das Auto des Spielers zu finden
+function findPlayerCar()
+    for _, vehicle in pairs(workspace.Vehicles:GetChildren()) do
+        -- Fahrzeuge mit dem Namen "Orange" überspringen
+        if vehicle.Name == "Orange" then
+            continue
+        end
+
+        local infoFolder = vehicle:FindFirstChild("InfoFolder")
+        if infoFolder and infoFolder:FindFirstChild("Owner") then
+            local owner = infoFolder.Owner
+            local ownerName = tostring(owner.Value)
+
+            -- Überprüfen, ob der Besitzer der Spieler ist
+            if string.lower(ownerName) == string.lower(player.Name) then
+                print("[BlackAir]: Car Found For Player: " .. vehicle.Name)
+                return vehicle
+            end
+        end
+    end
+    return nil -- Wenn kein Fahrzeug gefunden wurde
+end
+
+-- Funktion, um das Fahrzeug zu entsperren
+function unlockVehicle(vehicle)
+    local args = {
+        [1] = vehicle,
+        [2] = false -- false bedeutet, dass das Fahrzeug entsperrt wird
+    }
+
+    -- Fahrzeug entsperren
+    game:GetService("ReplicatedStorage"):WaitForChild("Client"):WaitForChild("Communication"):WaitForChild("LockVehicle"):InvokeServer(unpack(args))
+    print("[BlackAir]: Car Is Unlocked")
+end
+
+-- Funktion, um den Spieler ins Auto zu setzen
+function sitInCar(car)
+    local rs = game:GetService("ReplicatedStorage")
+    local identifierStorage = rs:WaitForChild("BridgeNet2"):WaitForChild("identifierStorage")
+    local realByte = identifierStorage:GetAttribute("RemoteEvent_OnSitVehicleSeat")
+
+    if not realByte then
+        warn("[BlackAir]: No Value Found Rejoin!")
+        return
+    end
+
+    local args = {
+        [1] = {
+            [1] = {
+                ["KevArgs"] = {
+                    [1] = car,
+                    [2] = car:FindFirstChild("Seats"):FindFirstChild("Seat1")
+                }
+            },
+            [2] = realByte -- ← echter Wert, dynamh
+        }
+    }
+
+    rs:WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent"):FireServer(unpack(args))
+    print("[BlackAir]: Player Is now in Car with valid byte:", realByte)
+end
+
+function teleportCarToCoordinates(car, coordinates)
+    -- Anchorn alle Teile
+    for _, part in pairs(car:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = true
+        end
+    end
+
+    wait(0.1)
+
+    -- Schritt 1: Hoch teleportieren
+    local offset = Vector3.new(0, 300, 0)
+    local upVector = car:GetModelCFrame().Position + offset
+    local upCFrame = CFrame.new(upVector)
+    car:PivotTo(upCFrame)
+    wait(0.3)
+
+    -- Schritt 2: Horizontal
+    local flatVector = Vector3.new(coordinates.X, upVector.Y, coordinates.Z)
+    car:PivotTo(CFrame.new(flatVector))
+    wait(0.3)
+
+    -- Schritt 3: Runter
+    car:PivotTo(CFrame.new(coordinates))
+    wait(0.3)
+
+    -- Unanchorn
+    for _, part in pairs(car:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = false
+        end
+    end
+
+    print("[BlackAir]: Whole car pivot-teleported cleanly")
+end
+
+-- Funktion, um den Spieler aus dem Auto aussteigen zu lassen
+function exitCar()
+    local rs = game:GetService("ReplicatedStorage")
+    local identifierStorage = rs:WaitForChild("BridgeNet2"):WaitForChild("identifierStorage")
+    local exitValue = identifierStorage:GetAttribute("RemoteEvent_VehicleInteraction")
+
+    if not exitValue then
+        warn("[BlackAir]: No Value Found Rejoin!")
+        return
+    end
+
+    local args = {
+        [1] = {
+            [1] = 6,
+            [2] = exitValue
+        }
+    }
+    rs:WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent"):FireServer(unpack(args))
+    print("[BlackAir]: Player has exited the Car")
+end
+
+function teleportCarCloseToPlayer(car, player)
+    local character = player.Character
+    if not character then
+        warn("[BlackAir]: Player character not found!")
+        return
+    end
+
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then
+        warn("[BlackAir]: No HumanoidRootPart found!")
+        return
+    end
+
+    -- Position vor dem Spieler berechnen
+    local frontOffset = rootPart.CFrame.LookVector * 5 -- 5 Studs vor dem Spieler
+    local targetPosition = rootPart.Position + frontOffset
+
+    -- Auto erstmal anchorn
+    for _, part in pairs(car:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = true
+        end
+    end
+
+    -- Schnell Teleportieren
+    car:PivotTo(CFrame.new(targetPosition))
+
+    -- Kleines Delay
+    wait(0.1)
+
+    -- Unanchorn
+    for _, part in pairs(car:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = false
+        end
+    end
+
+    print("[BlackAir]: Car teleported quickly in front of player")
+end
+
+function teleportAndDriveCar(destination)
+    local car = findPlayerCar()
+
+    if car then
+        print("[BlackAir]: Car Found!")
+
+        unlockVehicle(car)
+        wait(0.5)
+        -- Schnell Auto vor den Spieler teleportieren (ohne reinzuglitchen!)
+        teleportCarCloseToPlayer(car, player)
+
+        wait(0.2)
+
+        -- Spieler ins Auto setzen
+        sitInCar(car)
+
+        wait(0.5)
+
+        -- Danach teleportieren ans Ziel
+        teleportCarToCoordinates(car, destination)
+
+        wait(0.5)
+
+        -- Spieler aussteigen lassen
+        exitCar()
+    else
+        Rayfield:Notify({
+            Title = "BlackAir Error!",
+            Content = "Car not found or is not nearby!",
+            Duration = 5,
+            Image = 4483362458
+        })        
+        print("[BlackAir]: No Car Found For Player")
+        print("-------------------------------------")
+    end
+end
+
+local RobLocations1 = {
+    ["Jeweler"] = Vector3.new(-474.06, 44.45, 304.60),
+    ["Bank"] = Vector3.new(-471.43, 44.21, -1353.86),
+    ["Bank V2"] = Vector3.new(-410.46, 44.61, -231.44),
+    ["COUNT Gas Station 1"] = Vector3.new(-600.14, 44.06, 2428.84),
+    ["COUNT Gas Station 2"] = Vector3.new(-1273.04, 44.06, 2134.04),
+    ["COUNT Gas Station 3"] = Vector3.new(501.89, 44.42, -2251.43),
+    ["Moon Gas Station"] = Vector3.new(-1342.57, 44.16, -1148.33),
+    ["House 1"] = Vector3.new(-1638.81, 44.61, -801.35),
+    ["House 2"] = Vector3.new(-2111.37, 44.61, -865.30),
+    ["House 3"] = Vector3.new(-2058.47, 44.34, -622.46),
+}
+local Packstation = {
+    ["Gun Tuner Packstation"] = Vector3.new(-218.49, 44.22, -682.76),
+    ["Hospital Packstation"] = Vector3.new(494.36, 44.59, -1760.76),
+    ["Gas Station Packstation"] = Vector3.new(462.30, 44.61, -2208.20),
+    ["Police Packstation"] = Vector3.new(109.21, 72.06, 891.65),
+    ["Car Spawner Packstation"] = Vector3.new(-950.72, 44.61, 224.67),
+    ["Fire Department Packstation"] = Vector3.new(-2081.00, 44.21, 420.77),
+    ["House Packstation"] = Vector3.new(-1891.17, 44.21, -622.82),
+    ["D.A.C.E Packstation"] = Vector3.new(-1674.55, 44.69, -1265.32),
+    ["OPI Packstation"] = Vector3.new(828.02, 71.66, 250.04),
+}
+local teleportLocations = {
+    ["D.A.C.E"] = Vector3.new(-1724.39, 44.41, -1413.96),
+    ["Vehicle Spawn"] = Vector3.new(-999.83, 44.61, 149.93),
+    ["SkinShop"] = Vector3.new(-102.63, 44.21, -747.20),
+    ["Helipad"] = Vector3.new(530.98, 44.08, 1868.52),
+    ["Bus Depot"] = Vector3.new(-38.66, 72.06, 1021.00),
+    ["RoboZon"] = Vector3.new(-1442.59, 44.21, -2241.31),
+    ["Phamacy"] = Vector3.new(543.05, 44.58, -1733.14),
+    ["Ship Spawner"] = Vector3.new(-1366.17, 43.21, -1782.71),
+    ["Döner Shop"] = Vector3.new(-780.76, 44.21, 406.60),
+    ["Merch Store"] = Vector3.new(-295.63, 44.21, -71.60),
+    ["Drone Store"] = Vector3.new(-341.14, 44.21, -523.05),
+    ["OPI"] = Vector3.new(792.94, 71.66, 372.19),
+    ["Fire Department"] = Vector3.new(-1724.99, 44.61, 387.30),
+    ["Hospital"] = Vector3.new(426.24, 44.61, -1723.07),
+    ["Vehicle Shop"] = Vector3.new(108.92, 44.21, -2170.94),
+    ["Police"] = Vector3.new(-74.17, 72.06, 790.50),
+    ["Markt"] = Vector3.new(-592.26, 44.64, 60.13),
+    ["Car Tuner"] = Vector3.new(299.26, 44.21, -2133.71),
+    ["Ship Spawn"] = Vector3.new(-581.34, 35.00, -1704.16),
+}
+local Window = Rayfield:CreateWindow({
+	Name = "#BlackAir® | Main",
+    Icon = ("gem"),
+	LoadingTitle = "#BlackAirV4",
+	LoadingSubtitle = "by BlackAir Team",
+    ShowText = "Rayfield", -- for mobile users to unhide Rayfield, change if you'd like
+    Theme = blackAir, -- DarkBlue, Green, Light, Default - more coming soon!
+
+    ToggleUIKeybind = "G", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
+ 
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+    
+    ConfigurationSaving = {
+       Enabled = false,
+       FolderName = nil, -- Create a custom folder for your hub/game
+       FileName = "Big Hub"
+    },
+ 
+    Discord = {
+       Enabled = false, -- Prompt the user to join your Discord server if their executor supports it
+       Invite = "W5DujbSMN6", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+       RememberJoins = false -- Set this to false to make them join the discord every time they load it up
+    },
+ 
+    KeySystem = true, -- Set this to true to use our key system
+    KeySettings = {
+       Title = "#BlackAir® | Key System",
+       Subtitle = "Key System",
+       Note = "To Get Your Key : discord.gg/W5DujbSMN6 | V4 |", -- Use this to tell the user how to get a key
+       FileName = "i Love key", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+       SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+       Key = {"V4IsHERE",} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+    }
+ })
+
+-- circle-plus
+local PlayerStuff = Window:CreateTab("Player", 6022668898) -- Title, Image
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local char, humanoid, hrp
+
+-- Keys
+local keys = {W=false,A=false,S=false,D=false,Space=false,LeftShift=false}
+
+-- Smooth Fly Settings
+local flySpeed = 60
+local flyAccel = 8
+local flyCurrentVelocity = Vector3.zero
+
+-- Speed
+local speedEnabled = false
+local speedMultiplier = 5
+
+-- Character laden (und beim Respawn neu binden)
+local function setupCharacter(newChar)
+	char = newChar
+	hrp = char:WaitForChild("HumanoidRootPart")
+	humanoid = char:WaitForChild("Humanoid")
+end
+
+setupCharacter(player.Character or player.CharacterAdded:Wait())
+player.CharacterAdded:Connect(setupCharacter)
+
+local function getValuesFolder()
+	if not char then return end
+	local v = char:FindFirstChild("Values")
+	if not v then
+		v = Instance.new("Folder")
+		v.Name = "Values"
+		v.Parent = char
+	end
+	return v
+end
+
+local function getTrainWagon()
+	local values = getValuesFolder()
+	if not values then return end
+
+	local t = values:FindFirstChild("TrainWagon")
+	if not t then
+		t = Instance.new("ObjectValue")
+		t.Name = "TrainWagon"
+		t.Parent = values
+	end
+	return t
+end
+
+local FlyKeybind = PlayerStuff:CreateKeybind({
+	Name = "Fly Toggle",
+	CurrentKeybind = "X",
+	HoldToInteract = false,
+	Flag = "FlyKeybind",
+	Callback = function()
+		flying = not flying
+		if not humanoid then return end
+
+		if flying then
+			local train = getTrainWagon()
+			train.Value = workspace
+		else
+			local values = char and char:FindFirstChild("Values")
+			if values and values:FindFirstChild("TrainWagon") then
+				values.TrainWagon.Value = nil
+			end
+
+			hrp.AssemblyLinearVelocity = Vector3.zero
+			humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+		end
+	end,
+})
+
+local FlySlider = PlayerStuff:CreateSlider({
+	Name = "Fly Speed",
+	Range = {10, 800},
+	Increment = 1,
+	Suffix = "stud/s",
+	CurrentValue = flySpeed,
+	Flag = "FlySpeedSlider",
+	Callback = function(Value)
+		flySpeed = Value
+	end,
+})
+
+createLabel(PlayerStuff,"LocalPlayer Speed :")
+
+-- Keybind Speed
+local SpeedKeybind = PlayerStuff:CreateKeybind({
+	Name = "Speed Toggle",
+	CurrentKeybind = "Z",
+	HoldToInteract = false,
+	Flag = "SpeedKeybind",
+	Callback = function()
+		speedEnabled = not speedEnabled
+	end,
+})
+
+-- Slider Speed
+local Slider = PlayerStuff:CreateSlider({
+	Name = "Speed Multiplier",
+	Range = {1, 10},
+	Increment = 0.1,
+	Suffix = "x",
+	CurrentValue = speedMultiplier,
+	Flag = "SpeedSlider",
+	Callback = function(Value)
+		speedMultiplier = Value
+	end,
+})
+
+-- Input
+UIS.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	local k = input.KeyCode
+	if keys[k.Name] ~= nil then
+		keys[k.Name] = true
+	end
+end)
+
+UIS.InputEnded:Connect(function(input)
+	local k = input.KeyCode
+	if keys[k.Name] ~= nil then
+		keys[k.Name] = false
+	end
+end)
+
+RunService.Heartbeat:Connect(function(dt)
+	if not flying or not hrp or not humanoid then return end
+
+	local cam = workspace.CurrentCamera
+	local dir = Vector3.zero
+
+	if keys.W then dir += cam.CFrame.LookVector end
+	if keys.S then dir -= cam.CFrame.LookVector end
+	if keys.A then dir -= cam.CFrame.RightVector end
+	if keys.D then dir += cam.CFrame.RightVector end
+	if keys.Space then dir += Vector3.new(0, 1, 0) end
+	if keys.LeftShift then dir -= Vector3.new(0, 1, 0) end
+
+	local targetVelocity = Vector3.zero
+	if dir.Magnitude > 0 then
+		targetVelocity = dir.Unit * flySpeed
+	end
+
+	-- ✨ SMOOTH LERP
+	flyCurrentVelocity = flyCurrentVelocity:Lerp(
+		targetVelocity,
+		math.clamp(dt * flyAccel, 0, 1)
+	)
+
+	hrp.AssemblyLinearVelocity = flyCurrentVelocity
+	humanoid:ChangeState(Enum.HumanoidStateType.Freefall)
+end)
+
+-- Speed Loop
+RunService.Heartbeat:Connect(function()
+	if not speedEnabled or not hrp or not humanoid then return end
+	if humanoid.Health <= 0 then return end
+
+	local moveDir = humanoid.MoveDirection
+	if moveDir.Magnitude > 0 then
+		local targetVelocity = moveDir.Unit * (16 * speedMultiplier)
+		hrp.AssemblyLinearVelocity = Vector3.new(targetVelocity.X, hrp.AssemblyLinearVelocity.Y, targetVelocity.Z)
+	end
+end)
+
+createLabel(PlayerStuff,"The feature only works if you are inside a police car.")
+local humanoid = char:WaitForChild("Humanoid")
+
+local function checkAndSetCuffState()
+    for attributeName, attributeValue in pairs(humanoid:GetAttributes()) do
+        if attributeName == "CuffState" then
+            humanoid:SetAttribute("CuffState", 1)
+            print("[BlackAir]: UnHandCuff")
+            return
+        end
+    end
+end
+local function checkAndSetTase()
+    for attributeName, attributeValue in pairs(humanoid:GetAttributes()) do
+        if attributeName == "CuffState" then
+            humanoid:SetAttribute("CuffState", 1)
+            print("[BlackAir]: UnHandCuff")
+            return
+        end
+    end
+end
+
+local Button = PlayerStuff:CreateButton({
+    Name = "Get Out From Police Car",
+    Callback = function()
+        checkAndSetTase()
+        checkAndSetCuffState()
+    end,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+
+local AntiRagdollEnabled = false
+
+createLabel(PlayerStuff,"Anti Tazerd.")
+local Toggle = PlayerStuff:CreateToggle({
+    Name = "Anti Tazerd",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        AntiRagdollEnabled = Value
+    end,
+})
+
+local function getHumanoid()
+    local char = workspace:WaitForChild("Characters"):FindFirstChild(LocalPlayer.Name)
+    if char then
+        return char:FindFirstChildWhichIsA("Humanoid")
+    end
+end
+
+
+local function hookHumanoid(humanoid)
+    if not humanoid then return end
+
+    if humanoid:GetAttribute("Ragdoll") == true and AntiRagdollEnabled then
+        humanoid:SetAttribute("Ragdoll", false)
+    end
+
+    if humanoid:GetAttribute("IsTazerd") ~= nil and AntiRagdollEnabled then
+        humanoid:SetAttribute("IsTazerd", false)
+    end
+
+    humanoid.AttributeChanged:Connect(function(attr)
+        if not AntiRagdollEnabled then return end
+
+        if attr == "Ragdoll" then
+            if humanoid:GetAttribute("Ragdoll") == true then
+                humanoid:SetAttribute("Ragdoll", false)
+
+                if humanoid:GetAttribute("IsTazerd") ~= nil then
+                    humanoid:SetAttribute("IsTazerd", false)
+                end
+            end
+        elseif attr == "IsTazerd" then
+            if humanoid:GetAttribute("IsTazerd") == true then
+                humanoid:SetAttribute("IsTazerd", false)
+            end
+        end
+    end)
+end
+
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1)
+    hookHumanoid(getHumanoid())
+end)
+
+-- Beim Start
+task.wait(1)
+hookHumanoid(getHumanoid())
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local Player = Players.LocalPlayer
+local Noclip = false
+local NoclipConnection
+
+local function setNoclip(state)
+    Noclip = state
+
+    if Noclip then
+        NoclipConnection = RunService.Stepped:Connect(function()
+            local Character = Player.Character
+            if Character then
+                for _, part in pairs(Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if NoclipConnection then
+            NoclipConnection:Disconnect()
+            NoclipConnection = nil
+        end
+
+        local Character = Player.Character
+        if Character then
+            for _, part in pairs(Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end
+createLabel(PlayerStuff,"Noclip Toggel.")
+local Toggle = PlayerStuff:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Flag = "NoclipToggle",
+   Callback = function(Value)
+       setNoclip(Value)
+   end,
+})
+
+
+local EspPTab = Window:CreateTab("ESP Player", "brush") -- Title, Image
+
+--// Camera & Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+--// Settings
+local Settings = {
+	Enabled = false,
+	ShowName = true,
+	ShowJob = true,
+	ShowHealthText = true,
+	ShowItem = true,
+	ShowWantedTag = true,
+	ShowSkeleton = true,
+	ShowTracers = true,
+	MaxDistance = 500
+}
+
+--// Job Colors
+local JobData = {
+	["1"] = {Name = "Police", Color = Color3.fromRGB(0,120,255)},
+	["8"] = {Name = "GSG9", Color = Color3.fromRGB(0,180,255)},
+	["3"] = {Name = "Paramedic", Color = Color3.fromRGB(236,109,169)},
+	["2"] = {Name = "Firefighter", Color = Color3.fromRGB(255,100,0)},
+	["6"] = {Name = "Mechanic", Color = Color3.fromRGB(255,255,0)}
+}
+
+--// Helpers
+local function getJobInfo(player)
+	local id = tostring((player.GetAttribute and player:GetAttribute("Job")) or "")
+	return JobData[id] or {Name = "Civilian", Color = Color3.fromRGB(200,200,200)}
+end
+
+local function isWanted(player)
+	local w = player:GetAttribute("IsWanted")
+	if w == true or tostring(w):lower() == "true" then return true end
+	for _,obj in ipairs(player:GetChildren()) do
+		if obj:IsA("BoolValue") and obj.Name:lower():find("wanted") and obj.Value == true then
+			return true
+		end
+	end
+	local ls = player:FindFirstChild("leaderstats")
+	if ls then
+		for _,obj in ipairs(ls:GetChildren()) do
+			if obj.Name:lower():find("wanted") and tostring(obj.Value):lower() == "true" then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+--// Drawing creation
+local function makeText()
+	local t = Drawing.new("Text")
+	t.Size = 13
+	t.Center = true
+	t.Outline = true
+	t.Font = 2
+	t.Visible = false
+	return t
+end
+
+local function makeLine()
+	local l = Drawing.new("Line")
+	l.Thickness = 1
+	l.Color = Color3.new(1,1,1)
+	l.Visible = false
+	return l
+end
+
+--// Cache
+local EspCache, SkeletonCache, TracerCache = {}, {}, {}
+
+--// Smooth helper (lightweight)
+local function smoothLerp(oldPos, newPos, alpha)
+	if not oldPos then return newPos end
+	return oldPos + (newPos - oldPos) * alpha
+end
+
+--// Remove ESP (only on player remove)
+local function removeESP(player)
+	if EspCache[player] then
+		for _,v in pairs(EspCache[player]) do v.Visible=false; v:Remove() end
+		EspCache[player]=nil
+	end
+	if SkeletonCache[player] then
+		for _,v in pairs(SkeletonCache[player]) do v.Visible=false; v:Remove() end
+		SkeletonCache[player]=nil
+	end
+	if TracerCache[player] then
+		TracerCache[player].Visible=false; TracerCache[player]:Remove()
+		TracerCache[player]=nil
+	end
+end
+Players.PlayerRemoving:Connect(removeESP)
+
+--// Create ESP
+local function createESP(player)
+	if EspCache[player] then return end
+	EspCache[player] = {
+		Name = makeText(),
+		Job = makeText(),
+		Health = makeText(),
+		Item = makeText(),
+		Wanted = makeText()
+	}
+	if Settings.ShowSkeleton then
+		local bones = {}
+		for i=1,15 do bones[i]=makeLine() end
+		SkeletonCache[player] = bones
+	end
+	if Settings.ShowTracers then
+		local tracer = makeLine()
+		TracerCache[player] = tracer
+	end
+end
+
+--// Main Update Loop (optimized + smooth)
+RunService.RenderStepped:Connect(function()
+	if not Settings.Enabled then
+		for _,tbl in pairs(EspCache) do for _,obj in pairs(tbl) do obj.Visible=false end end
+		for _,tbl in pairs(SkeletonCache) do for _,obj in pairs(tbl) do obj.Visible=false end end
+		for _,obj in pairs(TracerCache) do obj.Visible=false end
+		return
+	end
+
+	for _,player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer then
+			local char = player.Character
+			local head = char and char:FindFirstChild("Head")
+			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+			local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+
+			if not (head and hrp and humanoid) then
+				local esp = EspCache[player]
+				if esp then for _,v in pairs(esp) do v.Visible=false end end
+				if SkeletonCache[player] then for _,v in pairs(SkeletonCache[player]) do v.Visible=false end end
+				if TracerCache[player] then TracerCache[player].Visible=false end
+				continue
+			end
+
+			local vector,onScreen = Camera:WorldToViewportPoint(head.Position)
+			local dist = (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude) or 0
+
+			if onScreen and dist <= Settings.MaxDistance then
+				if not EspCache[player] then createESP(player) end
+				local esp = EspCache[player]
+				local jobInfo = getJobInfo(player)
+				local wanted = isWanted(player)
+				local baseY = vector.Y
+
+				-- Name
+				if Settings.ShowName then
+					esp.Name.Visible = true
+					esp.Name.Position = smoothLerp(esp.Name.Position, Vector2.new(vector.X, baseY - 40), 0.25)
+					esp.Name.Color = Color3.new(1,1,1)
+					esp.Name.Text = player.DisplayName
+				else esp.Name.Visible = false end
+
+				-- Job
+				if Settings.ShowJob then
+					esp.Job.Visible = true
+					esp.Job.Position = smoothLerp(esp.Job.Position, Vector2.new(vector.X, baseY - 25), 0.25)
+					esp.Job.Color = wanted and Color3.fromRGB(255,0,0) or jobInfo.Color
+					esp.Job.Text = jobInfo.Name
+				else esp.Job.Visible = false end
+
+				-- Health
+				if Settings.ShowHealthText then
+					esp.Health.Visible = true
+					local hp = math.floor(humanoid.Health)
+					esp.Health.Position = smoothLerp(esp.Health.Position, Vector2.new(vector.X, baseY - 10), 0.25)
+					if hp < 30 then esp.Health.Color = Color3.fromRGB(255,60,60)
+					elseif hp < 60 then esp.Health.Color = Color3.fromRGB(255,200,0)
+					else esp.Health.Color = Color3.fromRGB(0,255,0) end
+					esp.Health.Text = "HP: "..hp
+				else esp.Health.Visible = false end
+
+				-- Item
+				if Settings.ShowItem then
+					local tool = char and char:FindFirstChildOfClass("Tool")
+					if not tool and player:FindFirstChild("Backpack") then
+						for _,t in ipairs(player.Backpack:GetChildren()) do
+							if t:IsA("Tool") then tool=t break end
+						end
+					end
+					local itemText = "Item: none"
+					if tool then
+						local attrName = tool:GetAttribute("ToolName")
+						itemText = "Item: " .. (attrName and tostring(attrName) ~= "" and tostring(attrName) or tool.Name)
+					end
+					esp.Item.Visible = true
+					esp.Item.Position = smoothLerp(esp.Item.Position, Vector2.new(vector.X, baseY + 5), 0.25)
+					esp.Item.Color = Color3.fromRGB(150,150,255)
+					esp.Item.Text = itemText
+				else esp.Item.Visible = false end
+
+				-- Wanted Tag
+				if Settings.ShowWantedTag and wanted then
+					esp.Wanted.Visible = true
+					esp.Wanted.Position = smoothLerp(esp.Wanted.Position, Vector2.new(vector.X, baseY - 55), 0.25)
+					esp.Wanted.Color = Color3.fromRGB(255,50,50)
+					esp.Wanted.Text = "! WANTED !"
+				else esp.Wanted.Visible = false end
+
+				-- Skeleton
+				if Settings.ShowSkeleton and SkeletonCache[player] then
+					local bones = SkeletonCache[player]
+					local parts = {
+						Head = head,
+						Torso = char:FindFirstChild("UpperTorso") or char:FindFirstChild("Torso"),
+						LUpperArm = char:FindFirstChild("LeftUpperArm"),
+						RUpperArm = char:FindFirstChild("RightUpperArm"),
+						LUpperLeg = char:FindFirstChild("LeftUpperLeg"),
+						RUpperLeg = char:FindFirstChild("RightUpperLeg"),
+						LLowerArm = char:FindFirstChild("LeftLowerArm"),
+						RLowerArm = char:FindFirstChild("RightLowerArm"),
+						LLowerLeg = char:FindFirstChild("LeftLowerLeg"),
+						RLowerLeg = char:FindFirstChild("RightLowerLeg")
+					}
+
+					local function get2D(part)
+						if not part then return nil end
+						local pos,vis = Camera:WorldToViewportPoint(part.Position)
+						if vis then return Vector2.new(pos.X,pos.Y) end
+					end
+
+					local torso = get2D(parts.Torso)
+					local headPos = get2D(parts.Head)
+					local lArm1, lArm2 = get2D(parts.LUpperArm), get2D(parts.LLowerArm)
+					local rArm1, rArm2 = get2D(parts.RUpperArm), get2D(parts.RLowerArm)
+					local lLeg1, lLeg2 = get2D(parts.LUpperLeg), get2D(parts.LLowerLeg)
+					local rLeg1, rLeg2 = get2D(parts.RUpperLeg), get2D(parts.RLowerLeg)
+
+					local color = wanted and Color3.fromRGB(255,0,0) or jobInfo.Color
+					local i=1
+					local function drawLine(a,b)
+						local line=bones[i]; i+=1
+						if a and b then
+							line.From = smoothLerp(line.From, a, 0.25)
+							line.To = smoothLerp(line.To, b, 0.25)
+							line.Color = color
+							line.Visible = true
+						else line.Visible=false end
+					end
+
+					drawLine(headPos,torso)
+					drawLine(torso,lArm1); drawLine(lArm1,lArm2)
+					drawLine(torso,rArm1); drawLine(rArm1,rArm2)
+					drawLine(torso,lLeg1); drawLine(lLeg1,lLeg2)
+					drawLine(torso,rLeg1); drawLine(rLeg1,rLeg2)
+					for x=i,#bones do bones[x].Visible=false end
+				elseif SkeletonCache[player] then
+					for _,l in pairs(SkeletonCache[player]) do l.Visible=false end
+				end
+
+				-- Tracer
+				if Settings.ShowTracers then
+					if not TracerCache[player] then TracerCache[player]=makeLine() end
+					local tracer = TracerCache[player]
+					tracer.Visible = true
+					tracer.Color = wanted and Color3.fromRGB(255,0,0) or jobInfo.Color
+					local fromPos = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
+					local toPos = Vector2.new(vector.X, vector.Y)
+					tracer.From = smoothLerp(tracer.From, fromPos, 0.25)
+					tracer.To = smoothLerp(tracer.To, toPos, 0.25)
+				else
+					if TracerCache[player] then TracerCache[player].Visible=false end
+				end
+			else
+				-- Off-screen: alles nur unsichtbar
+				local esp = EspCache[player]
+				if esp then for _,v in pairs(esp) do v.Visible=false end end
+				if SkeletonCache[player] then for _,v in pairs(SkeletonCache[player]) do v.Visible=false end end
+				if TracerCache[player] then TracerCache[player].Visible=false end
+			end
+		end
+	end
+end)
+
+--// UI Toggles (optional)
+if EspPTab and EspPTab.CreateToggle then
+	EspPTab:CreateToggle({Name="Enable ESP", CurrentValue=false, Flag="esp_enabled", Callback=function(v) Settings.Enabled=v end})
+	EspPTab:CreateToggle({Name="Show Name", CurrentValue=true, Flag="esp_name", Callback=function(v) Settings.ShowName=v end})
+	EspPTab:CreateToggle({Name="Show Job", CurrentValue=true, Flag="esp_job", Callback=function(v) Settings.ShowJob=v end})
+	EspPTab:CreateToggle({Name="Show Health", CurrentValue=true, Flag="esp_health", Callback=function(v) Settings.ShowHealthText=v end})
+	EspPTab:CreateToggle({Name="Show Item", CurrentValue=true, Flag="esp_item", Callback=function(v) Settings.ShowItem=v end})
+	EspPTab:CreateToggle({Name="Show Wanted", CurrentValue=true, Flag="esp_wanted", Callback=function(v) Settings.ShowWantedTag=v end})
+	EspPTab:CreateToggle({Name="Show Skeleton", CurrentValue=true, Flag="esp_skel", Callback=function(v) Settings.ShowSkeleton=v end})
+	EspPTab:CreateToggle({Name="Show Tracers", CurrentValue=true, Flag="esp_tracer", Callback=function(v) Settings.ShowTracers=v end})
+end
+
+local EspTab = Window:CreateTab("ESP", 6026568213) -- Title, Image
+
+--// Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local VehiclesFolder = workspace:WaitForChild("Vehicles")
+
+--// Settings
+local Settings = {
+    Enabled = false,
+    MaxDistance = 500,
+    Smoothness = 0.25
+}
+createLabel(EspTab,"Toggel Vehicle ESP. ")
+--// UI Toggle
+if EspTab and EspTab.CreateToggle then
+    EspTab:CreateToggle({
+        Name = "Vehicle ESP",
+        CurrentValue = Settings.Enabled, -- ✅ immer sync
+        Flag = "vehicle_esp",
+        Callback = function(Value)
+            Settings.Enabled = Value
+        end,
+    })
+end
+--// Status Colors
+local StatusColors = {
+    Normal = Color3.fromRGB(85,255,85),
+    Damaged = Color3.fromRGB(255,170,0),
+    Broken = Color3.fromRGB(255,0,0),
+    Critical = Color3.fromRGB(150,0,0)
+}
+
+--// Job Colors (STRING KEYS FIXED)
+local JobColors = {
+    ["1"] = {Name="Police", Color=Color3.fromRGB(0,120,255)},
+    ["8"] = {Name="GSG9", Color=Color3.fromRGB(0,180,255)},
+    ["3"] = {Name="Paramedic", Color=Color3.fromRGB(236,109,169)},
+    ["2"] = {Name="Firefighter", Color=Color3.fromRGB(255,100,0)},
+    ["6"] = {Name="Mechanic", Color=Color3.fromRGB(255,255,0)}
+}
+
+--// Cache
+local Cache = {}
+
+--// Drawing Creator
+local function makeText(size)
+    local t = Drawing.new("Text")
+    t.Size = size
+    t.Center = true
+    t.Outline = true
+    t.OutlineColor = Color3.new(0,0,0)
+    t.Font = 2
+    t.Visible = false
+    return t
+end
+
+local function createESP(vehicle)
+    Cache[vehicle] = {
+        Wanted = makeText(20),
+        Name = makeText(18),
+        Owner = makeText(17),
+        Status = makeText(16)
+    }
+end
+
+local function removeESP(vehicle)
+    if Cache[vehicle] then
+        for _,obj in pairs(Cache[vehicle]) do
+            obj:Remove()
+        end
+        Cache[vehicle] = nil
+    end
+end
+
+--// Smooth
+local function smooth(old,new,a)
+    if not old then return new end
+    return old:Lerp(new,a)
+end
+
+--// Pulse
+local function pulse()
+    local t = tick()*4
+    local alpha = (math.sin(t)+1)/2
+    return Color3.fromRGB(255,0,0):Lerp(Color3.fromRGB(255,120,120), alpha)
+end
+
+--// Wanted Check
+local function isWanted(player)
+    if not player then return false end
+
+    local w = player:GetAttribute("IsWanted")
+    if w == true then return true end
+
+    local ls = player:FindFirstChild("leaderstats")
+    if ls then
+        local val = ls:FindFirstChild("Wanted")
+        if val and tostring(val.Value):lower() == "true" then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function getTopPosition(model)
+    if not model or not model.Parent then return nil end
+
+    -- Erst versuchen BoundingBox (beste Lösung)
+    local success, cf, size = pcall(function()
+        return model:GetBoundingBox()
+    end)
+
+    if success and size and size.Y > 0 then
+        return cf.Position + Vector3.new(0, size.Y/2 + 4, 0)
+    end
+
+    -- Fallback: höchsten BasePart suchen
+    local highestY = -math.huge
+    local highestPart
+
+    for _,v in ipairs(model:GetDescendants()) do
+        if v:IsA("BasePart") then
+            if v.Position.Y > highestY then
+                highestY = v.Position.Y
+                highestPart = v
+            end
+        end
+    end
+
+    if highestPart then
+        return highestPart.Position + Vector3.new(0, 2, 0)
+    end
+
+    return nil
+end
+
+--// Track Vehicles (PERFORMANCE FIX)
+local Vehicles = {}
+
+for _,v in ipairs(VehiclesFolder:GetChildren()) do
+    if v:IsA("Model") then
+        Vehicles[v] = true
+        createESP(v)
+    end
+end
+
+VehiclesFolder.ChildAdded:Connect(function(v)
+    if v:IsA("Model") then
+        task.wait(0.2)
+        Vehicles[v] = true
+        createESP(v)
+    end
+end)
+
+VehiclesFolder.ChildRemoved:Connect(function(v)
+    Vehicles[v] = nil
+    removeESP(v)
+end)
+
+--// MAIN LOOP
+RunService.RenderStepped:Connect(function()
+
+    if not Settings.Enabled then
+        for _,esp in pairs(Cache) do
+            for _,obj in pairs(esp) do
+                obj.Visible = false
+            end
+        end
+        return
+    end
+
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    for vehicle,_ in pairs(Vehicles) do
+
+        if not vehicle.Parent then
+            removeESP(vehicle)
+            Vehicles[vehicle] = nil
+            continue
+        end
+
+        local esp = Cache[vehicle]
+        if not esp then
+            createESP(vehicle)
+            esp = Cache[vehicle]
+        end
+
+        local topPos = getTopPosition(vehicle)
+        if not topPos then
+           for _,obj in pairs(esp) do
+                    obj.Visible = false
+           end
+            continue
+        end
+
+        local dist = (root.Position - topPos).Magnitude
+        local vec,onScreen = Camera:WorldToViewportPoint(topPos)
+
+        if not onScreen or dist > Settings.MaxDistance then
+            for _,obj in pairs(esp) do
+                obj.Visible = false
+            end
+            continue
+        end
+
+        local spacing = 18
+        local base = Vector2.new(vec.X,vec.Y)
+
+        -- Owner
+        local ownerPlayer
+        local info = vehicle:FindFirstChild("InfoFolder")
+        if info and info:FindFirstChild("Owner") then
+            ownerPlayer = info.Owner.Value
+        end
+
+        local wanted = ownerPlayer and isWanted(ownerPlayer)
+
+        -- Wanted Text
+        if wanted then
+            esp.Wanted.Visible = true
+            esp.Wanted.Position = smooth(esp.Wanted.Position, base - Vector2.new(0,spacing*3), Settings.Smoothness)
+            esp.Wanted.Text = "!!! WANTED !!!"
+            esp.Wanted.Color = pulse()
+        else
+            esp.Wanted.Visible = false
+        end
+
+        -- Vehicle Name
+        esp.Name.Visible = true
+        esp.Name.Position = smooth(esp.Name.Position, base - Vector2.new(0,spacing*2), Settings.Smoothness)
+        esp.Name.Text = vehicle.Name
+        esp.Name.Color = Color3.new(1,1,1)
+
+        -- Job Logic (FIXED STRING CONVERSION)
+        local jobColor = Color3.fromRGB(200,200,200)
+        local jobName = "Civilian"
+
+        if ownerPlayer and not wanted then
+            local job = tostring(ownerPlayer:GetAttribute("Job"))
+            if JobColors[job] then
+                jobColor = JobColors[job].Color
+                jobName = JobColors[job].Name
+            end
+        end
+
+        esp.Owner.Visible = true
+        esp.Owner.Position = smooth(esp.Owner.Position, base - Vector2.new(0,spacing), Settings.Smoothness)
+        esp.Owner.Text = "Owner: "..(ownerPlayer and ownerPlayer.Name or "N/A").." | "..jobName
+        esp.Owner.Color = wanted and pulse() or jobColor
+
+        -- Status
+        local status = vehicle:GetAttribute("DamageStatus") or "Unknown"
+        esp.Status.Visible = true
+        esp.Status.Position = smooth(esp.Status.Position, base, Settings.Smoothness)
+        esp.Status.Text = "Status: "..status
+        esp.Status.Color = StatusColors[status] or Color3.new(1,1,1)
+
+    end
+end)
+
+
+-- Refactored Full-Body Trails & Ghost script
+-- Keeps Rayfield GUI (guarded) and reduces local register usage via a context table
+print("FullBodyTrails script starting")
+
+task.spawn(function()
+    local ctx = {} -- single context table that holds state, storages, and functions
+
+    -- services / player (minimal locals)
+    local Players = game:GetService("Players")
+    local TweenService = game:GetService("TweenService")
+    local RunService = game:GetService("RunService")
+    local player = Players.LocalPlayer
+
+    -- CONFIG in context
+    ctx.TRAILS_PER_PART = 3
+    ctx.BASE_LIFETIME = 0.4
+    ctx.SKIP_PART_NAME = "HumanoidRootPart"
+    ctx.ACTIVE_TRAILS_FOLDER = "RBX_FullBodyTrails_v4"
+
+    -- STATE storage (inside ctx)
+    ctx.trailEnabled = false
+    ctx.ghostEnabled = false
+    ctx.weaponGhostEnabled = false
+    ctx.ghostColor = Color3.fromRGB(0, 255, 255)
+
+    -- STORAGE tables
+    ctx.originalProps = {}        -- part -> {Color, Transparency, Material}
+    ctx.originalWeaponProps = {}  -- tool part -> props
+    ctx.charConnections = {}      -- connections for current character
+    ctx.backpackConn = nil
+    ctx.characterToolConn = nil
+
+    -- helpers as methods on ctx to avoid many locals
+    function ctx.isValidBodyPart(part)
+        return part and part:IsA("BasePart") and part.Name ~= ctx.SKIP_PART_NAME
+    end
+
+    function ctx.recordOriginalPropsForPart(part, storeTable)
+        if not part or not part:IsA("BasePart") then return end
+        if storeTable[part] == nil then
+            storeTable[part] = { Color = part.Color, Transparency = part.Transparency, Material = part.Material }
+        end
+    end
+
+    function ctx.recordOriginalsForCharacter(char)
+        ctx.originalProps = {}
+        for _, p in pairs(char:GetDescendants()) do
+            if ctx.isValidBodyPart(p) then
+                ctx.recordOriginalPropsForPart(p, ctx.originalProps)
+            end
+        end
+    end
+
+    function ctx.restoreOriginalsForCharacter(char)
+        for part, props in pairs(ctx.originalProps) do
+            if part and part.Parent == char and ctx.isValidBodyPart(part) then
+                pcall(function() part.Material = props.Material end)
+                local ok, tw = pcall(function()
+                    return TweenService:Create(part, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+                        Color = props.Color,
+                        Transparency = props.Transparency
+                    })
+                end)
+                if ok and tw then tw:Play() else
+                    pcall(function() part.Color = props.Color; part.Transparency = props.Transparency end)
+                end
+            end
+        end
+    end
+
+    -- Trails
+    function ctx.createTrailsForPart(part, parentFolder)
+        local created = {}
+        for i = 1, ctx.TRAILS_PER_PART do
+            local attach0 = Instance.new("Attachment")
+            local attach1 = Instance.new("Attachment")
+            attach0.Parent = part
+            attach1.Parent = part
+
+            local offset = Vector3.new((math.random() - 0.5) * 0.3, (math.random() - 0.5) * 0.3, (math.random() - 0.5) * 0.3)
+            attach0.Position = offset
+            attach1.Position = offset + Vector3.new(0, -0.4 - math.random() * 0.2, 0)
+
+            local trail = Instance.new("Trail")
+            trail.Attachment0 = attach0
+            trail.Attachment1 = attach1
+            trail.LightEmission = 1
+            trail.Lifetime = ctx.BASE_LIFETIME + math.random() * 0.2
+            trail.Enabled = false
+            trail.Transparency = NumberSequence.new(0, 0.35, 1)
+            trail.MinLength = 0.02
+            trail.Texture = "rbxassetid://446111271"
+            trail.TextureMode = Enum.TextureMode.Stretch
+            trail.Color = ColorSequence.new(ctx.ghostColor)
+            trail.Parent = parentFolder
+
+            table.insert(created, trail)
+        end
+        return created
+    end
+
+    function ctx.clearTrailsForCharacter(char)
+        local folder = char:FindFirstChild(ctx.ACTIVE_TRAILS_FOLDER)
+        if folder then folder:Destroy() end
+
+        -- best-effort cleanup attachments/trails we created
+        for _, p in pairs(char:GetDescendants()) do
+            if ctx.isValidBodyPart(p) then
+                for _, c in pairs(p:GetChildren()) do
+                    if c:IsA("Trail") and c.Texture == "rbxassetid://446111271" then
+                        pcall(function() c:Destroy() end)
+                    end
+                end
+            end
+        end
+    end
+
+    function ctx.buildTrailsForCharacter(char)
+        ctx.clearTrailsForCharacter(char)
+        local folder = Instance.new("Folder")
+        folder.Name = ctx.ACTIVE_TRAILS_FOLDER
+        folder.Parent = char
+
+        for _, part in pairs(char:GetDescendants()) do
+            if ctx.isValidBodyPart(part) then
+                ctx.createTrailsForPart(part, folder)
+            end
+        end
+    end
+
+    function ctx.setTrailsEnabledForCharacter(char, enabled)
+        local folder = char:FindFirstChild(ctx.ACTIVE_TRAILS_FOLDER)
+        if folder then
+            for _, t in pairs(folder:GetDescendants()) do
+                if t:IsA("Trail") then
+                    t.Enabled = enabled
+                end
+            end
+        end
+    end
+
+    -- Ghost apply
+    function ctx.applyGhostToCharacter(char, state)
+        if next(ctx.originalProps) == nil then
+            ctx.recordOriginalsForCharacter(char)
+        end
+
+        for _, part in pairs(char:GetDescendants()) do
+            if ctx.isValidBodyPart(part) then
+                if state then
+                    pcall(function() part.Material = Enum.Material.ForceField end)
+                else
+                    if ctx.originalProps[part] and ctx.originalProps[part].Material then
+                        pcall(function() part.Material = ctx.originalProps[part].Material end)
+                    else
+                        pcall(function() part.Material = Enum.Material.Plastic end)
+                    end
+                end
+
+                local targetColor = state and ctx.ghostColor or (ctx.originalProps[part] and ctx.originalProps[part].Color or part.Color)
+                local targetTransparency = state and 0.45 or (ctx.originalProps[part] and ctx.originalProps[part].Transparency or 0)
+                local ok, tw = pcall(function()
+                    return TweenService:Create(part, TweenInfo.new(0.45, Enum.EasingStyle.Quad), {
+                        Color = targetColor,
+                        Transparency = targetTransparency
+                    })
+                end)
+                if ok and tw then tw:Play() else
+                    pcall(function() part.Color = targetColor; part.Transparency = targetTransparency end)
+                end
+            end
+        end
+    end
+
+    -- Watch for new parts on character
+    function ctx.attachCharacterListeners(char)
+        -- disconnect previous
+        for _, con in pairs(ctx.charConnections) do
+            if con and con.Disconnect then
+                pcall(function() con:Disconnect() end)
+            end
+        end
+        ctx.charConnections = {}
+
+        local con1 = char.DescendantAdded:Connect(function(desc)
+            if desc:IsA("BasePart") and ctx.isValidBodyPart(desc) then
+                ctx.recordOriginalPropsForPart(desc, ctx.originalProps)
+                if ctx.ghostEnabled then
+                    pcall(function() desc.Material = Enum.Material.ForceField end)
+                    local ok, tw = pcall(function()
+                        return TweenService:Create(desc, TweenInfo.new(0.35, Enum.EasingStyle.Quad), {
+                            Color = ctx.ghostColor,
+                            Transparency = 0.45
+                        })
+                    end)
+                    if ok and tw then tw:Play() else
+                        pcall(function() desc.Color = ctx.ghostColor; desc.Transparency = 0.45 end)
+                    end
+                end
+            end
+        end)
+        table.insert(ctx.charConnections, con1)
+
+        local con2 = char.DescendantRemoving:Connect(function(desc)
+            if desc:IsA("BasePart") then
+                ctx.originalProps[desc] = nil
+                ctx.originalWeaponProps[desc] = nil
+            end
+        end)
+        table.insert(ctx.charConnections, con2)
+    end
+
+    -- Weapon ghosting
+    function ctx.isWeaponTool(tool)
+        if not tool or not tool:IsA("Tool") then return false end
+        local info = tool:FindFirstChild("InfoFolder")
+        if not info then return false end
+        local ammo = info:FindFirstChild("Ammo")
+        return ammo and ammo:IsA("NumberValue")
+    end
+
+    function ctx.recordOriginalsForTool(tool)
+        for _, child in pairs(tool:GetDescendants()) do
+            if child:IsA("BasePart") then
+                if ctx.originalWeaponProps[child] == nil then
+                    ctx.originalWeaponProps[child] = { Color = child.Color, Transparency = child.Transparency, Material = child.Material }
+                end
+            end
+        end
+    end
+
+    function ctx.applyGhostToWeaponParts(tool, state)
+        ctx.recordOriginalsForTool(tool)
+        for _, child in pairs(tool:GetDescendants()) do
+            if child:IsA("BasePart") then
+                if state then
+                    pcall(function() child.Material = Enum.Material.ForceField end)
+                    local ok, tw = pcall(function()
+                        return TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                            Color = ctx.ghostColor,
+                            Transparency = 0.45
+                        })
+                    end)
+                    if ok and tw then tw:Play() else
+                        pcall(function() child.Color = ctx.ghostColor; child.Transparency = 0.45 end)
+                    end
+                else
+                    local props = ctx.originalWeaponProps[child]
+                    if props then
+                        pcall(function() child.Material = props.Material end)
+                        local ok, tw = pcall(function()
+                            return TweenService:Create(child, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                                Color = props.Color,
+                                Transparency = props.Transparency
+                            })
+                        end)
+                        if ok and tw then tw:Play() else
+                            pcall(function() child.Color = props.Color; child.Transparency = props.Transparency end)
+                        end
+                    else
+                        pcall(function() child.Material = Enum.Material.Plastic; child.Transparency = 0 end)
+                    end
+                end
+            end
+        end
+    end
+
+    function ctx.scanAndApplyWeaponsInContainer(container, state)
+        if not container then return end
+        for _, item in pairs(container:GetChildren()) do
+            if item:IsA("Tool") and ctx.isWeaponTool(item) then
+                ctx.applyGhostToWeaponParts(item, state)
+            end
+        end
+    end
+
+    function ctx.attachWeaponWatchers()
+        if ctx.backpackConn then pcall(function() ctx.backpackConn:Disconnect() end) end
+        if ctx.characterToolConn then pcall(function() ctx.characterToolConn:Disconnect() end) end
+
+        local backpack = player:WaitForChild("Backpack")
+        ctx.backpackConn = backpack.ChildAdded:Connect(function(child)
+            if child:IsA("Tool") and ctx.isWeaponTool(child) then
+                ctx.recordOriginalsForTool(child)
+                if ctx.weaponGhostEnabled then ctx.applyGhostToWeaponParts(child, true) end
+            end
+        end)
+
+        local function watchCharacterTools()
+            local char = player.Character
+            if not char then return end
+            ctx.characterToolConn = char.ChildAdded:Connect(function(child)
+                if child:IsA("Tool") and ctx.isWeaponTool(child) then
+                    ctx.recordOriginalsForTool(child)
+                    if ctx.weaponGhostEnabled then ctx.applyGhostToWeaponParts(child, true) end
+                end
+            end)
+        end
+        watchCharacterTools()
+        player.CharacterAdded:Connect(function()
+            wait(0.1)
+            watchCharacterTools()
+        end)
+    end
+
+    -- Heartbeat update for trails
+    RunService.Heartbeat:Connect(function()
+        local char = player.Character
+        if not char then return end
+        if ctx.trailEnabled then
+            local folder = char:FindFirstChild(ctx.ACTIVE_TRAILS_FOLDER)
+            if folder then
+                for _, t in pairs(folder:GetDescendants()) do
+                    if t:IsA("Trail") then
+                        t.Color = ColorSequence.new(ctx.ghostColor)
+                        t.Lifetime = ctx.BASE_LIFETIME + (math.random() * 0.25)
+                        t.Transparency = NumberSequence.new(0, math.random() * 0.4, 1)
+                        t.WidthScale = NumberSequence.new({
+                            NumberSequenceKeypoint.new(0, 0.5 + math.random() * 0.7),
+                            NumberSequenceKeypoint.new(1, 0)
+                        })
+                        t.Enabled = true
+                    end
+                end
+            end
+        end
+    end)
+
+    -- Character spawn/respawn handling
+    function ctx.onCharacterAdded(char)
+        char:WaitForChild("Humanoid", 5)
+        ctx.clearTrailsForCharacter(char)
+        ctx.recordOriginalsForCharacter(char)
+        ctx.buildTrailsForCharacter(char)
+        ctx.attachCharacterListeners(char)
+        ctx.setTrailsEnabledForCharacter(char, ctx.trailEnabled)
+        if ctx.ghostEnabled then ctx.applyGhostToCharacter(char, true) end
+        if ctx.weaponGhostEnabled then ctx.scanAndApplyWeaponsInContainer(char, true) end
+    end
+
+    -- initial connect
+    if player.Character then
+        ctx.onCharacterAdded(player.Character)
+    end
+    player.CharacterAdded:Connect(function(c) ctx.onCharacterAdded(c) end)
+    ctx.attachWeaponWatchers()
+
+    -- GUI (Rayfield) integration: we keep it but only run if EspTab exists
+    -- Replace 'EspTab' with your rayfield tab variable name if different
+    -- To avoid many locals we reference 'EspTab' directly (must exist in environment)
+    local function InitGui()
+        if typeof(EspTab) ~= "table" and typeof(EspTab) ~= "userdata" and typeof(EspTab) ~= "instance" then
+            warn("EspTab not found — skipping GUI init")
+            return
+        end
+        -- safe guard: ensure CreateToggle exists
+        if not EspTab.CreateToggle then
+            warn("EspTab doesn't expose Create* methods — skipping GUI init")
+            return
+        end
+
+        -- Info labels (no need to store them)
+        pcall(function() EspTab:createLabel("This Is Not Server Side (Not FE)", "info") end)
+        pcall(function() EspTab:createLabel("Toggle Esp Body :", "info") end)
+createLabel(EspTab,"Toggel Player Ghost :")
+        -- Trail toggle
+        pcall(function()
+            EspTab:CreateToggle({
+                Name = "Body Trail",
+                CurrentValue = false,
+                Flag = "TrailToggle",
+                Callback = function(Value)
+                    ctx.trailEnabled = Value
+                    local char = player.Character
+                    if char then ctx.setTrailsEnabledForCharacter(char, Value) end
+                end,
+            })
+        end)
+
+        -- Trail color picker
+        pcall(function()
+            EspTab:CreateColorPicker({
+                Name = "Trail Color",
+                Color = ctx.ghostColor,
+                Flag = "TrailColor",
+                Callback = function(Value)
+                    ctx.ghostColor = Value
+                    local char = player.Character
+                    if char then
+                        local folder = char:FindFirstChild(ctx.ACTIVE_TRAILS_FOLDER)
+                        if folder then
+                            for _, t in pairs(folder:GetDescendants()) do
+                                if t:IsA("Trail") then t.Color = ColorSequence.new(Value) end
+                            end
+                        end
+                        if ctx.ghostEnabled then ctx.applyGhostToCharacter(char, true) end
+                    end
+                    ctx.scanAndApplyWeaponsInContainer(player:FindFirstChild("Backpack"), ctx.weaponGhostEnabled)
+                    if player.Character then ctx.scanAndApplyWeaponsInContainer(player.Character, ctx.weaponGhostEnabled) end
+                end,
+            })
+        end)
+
+        -- Ghost player toggle
+        pcall(function()
+            EspTab:CreateToggle({
+                Name = "Ghost Player",
+                CurrentValue = false,
+                Flag = "GhostToggle",
+                Callback = function(Value)
+                    ctx.ghostEnabled = Value
+                    local char = player.Character
+                    if char then
+                        if Value then ctx.applyGhostToCharacter(char, true)
+                        else ctx.restoreOriginalsForCharacter(char) end
+                    end
+                end,
+            })
+        end)
+
+        -- Weapon ghost toggle
+        pcall(function()
+            EspTab:CreateToggle({
+                Name = "Weapon Ghost",
+                CurrentValue = false,
+                Flag = "WeaponGhostToggle",
+                Callback = function(Value)
+                    ctx.weaponGhostEnabled = Value
+                    if Value then
+                        ctx.scanAndApplyWeaponsInContainer(player:FindFirstChild("Backpack"), true)
+                        if player.Character then ctx.scanAndApplyWeaponsInContainer(player.Character, true) end
+                    else
+                        for part, props in pairs(ctx.originalWeaponProps) do
+                            if part and part.Parent then
+                                pcall(function() part.Material = props.Material end)
+                                local ok, tw = pcall(function()
+                                    return TweenService:Create(part, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                                        Color = props.Color,
+                                        Transparency = props.Transparency
+                                    })
+                                end)
+                                if ok and tw then tw:Play() else
+                                    pcall(function() part.Color = props.Color; part.Transparency = props.Transparency end)
+                                end
+                            end
+                        end
+                    end
+                end,
+            })
+        end)
+    end
+
+    -- call GUI initializer (safe, guarded)
+    pcall(InitGui)
+
+    -- End of main task.spawn wrapper
+end)
+
+local Misc1 = Window:CreateTab("Misc", 6031086176)
+
+
+--------------------------------------------------
+-- LABELS
+--------------------------------------------------
+createLabel(Misc1,"Toggle Click To Break (ATM, Glass J, and more):")
+createLabel(Misc1,"You need a Crowbar For This.")
+
+--------------------------------------------------
+-- SERVICES / PLAYER
+--------------------------------------------------
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local character = player.Character or player.CharacterAdded:Wait()
+player.CharacterAdded:Connect(function(char)
+    character = char
+end)
+
+--------------------------------------------------
+-- SETTINGS
+--------------------------------------------------
+local REQUIRED_TOOLNAME = "CrowbarBlue"
+local clickToBreakEnabled = false
+
+--------------------------------------------------
+-- NOTIFY
+--------------------------------------------------
+local function notify(title, text)
+	Rayfield:Notify({
+		Title = title,
+		Content = text,
+		Duration = 4,
+		Image = 4483362458
+	})
+end
+
+--------------------------------------------------
+-- CROWBAR UTILS
+--------------------------------------------------
+local function getCrowbar()
+	if character then
+		for _, t in ipairs(character:GetChildren()) do
+			if t:IsA("Tool") and t:GetAttribute("ToolName") == REQUIRED_TOOLNAME then
+				return t
+			end
+		end
+	end
+
+	for _, t in ipairs(player.Backpack:GetChildren()) do
+		if t:IsA("Tool") and t:GetAttribute("ToolName") == REQUIRED_TOOLNAME then
+			return t
+		end
+	end
+end
+
+--------------------------------------------------
+-- TOGGLE
+--------------------------------------------------
+local Toggle = Misc1:CreateToggle({
+	Name = "Click To Break (Crowbar Bypass)",
+	CurrentValue = false,
+	Flag = "ToggleBreakGlass",
+	Callback = function(Value)
+
+		-- TOGGLE AUS
+		if not Value then
+			clickToBreakEnabled = false
+			notify("Disabled", "Click To Break disabled.")
+			return
+		end
+
+		-- TOGGLE AN → Crowbar Scan
+		local crowbar = getCrowbar()
+		if not crowbar then
+			notify("Error", "Crowbar not found.")
+			Toggle:Set(false)
+			return
+		end
+
+		clickToBreakEnabled = true
+		notify("Found", "Crowbar detected. Click To Break enabled.")
+	end
+})
+
+--------------------------------------------------
+-- HIT TYPE
+--------------------------------------------------
+local function getHitType(model)
+	local name = model.Name
+
+	if name == "Long" or name == "Short" or name == "Breaked" then
+		return 4
+	end
+
+	if name == "ATM" or name == "Automat" then
+		return 3
+	end
+
+	return 3
+end
+
+--------------------------------------------------
+-- BREAK FUNCTION
+--------------------------------------------------
+local function breakGlass(model, hit)
+	local crowbar = getCrowbar()
+	if not crowbar then
+		notify("Error", "Crowbar unequipped.")
+		return
+	end
+
+	crowbar.OnDamageEvent:FireServer({{
+		HitType = getHitType(model),
+		Model = model,
+		Hit = hit
+	}}, 3)
+end
+
+--------------------------------------------------
+-- CLICK DETECTION
+--------------------------------------------------
+mouse.Button1Down:Connect(function()
+	if not clickToBreakEnabled then return end
+
+	local target = mouse.Target
+	if not target or not target.Parent then return end
+
+	local parent = target.Parent
+	if parent.Name == "Long"
+	or parent.Name == "Short"
+	or parent.Name == "Breaked"
+	or parent.Name == "ATM"
+	or parent.Name == "Automat" then
+		breakGlass(parent, target)
+	end
+end)
+
+
+local RunService = game:GetService("RunService")
+local connection
+
+-- Funktion: Triggert einen ProximityPrompt sofort
+local function triggerPrompt(prompt)
+    if prompt and prompt:IsA("ProximityPrompt") then
+        prompt.HoldDuration = 0
+        task.spawn(function()
+            prompt:InputHoldBegin()
+            task.wait(0.05)
+            prompt:InputHoldEnd()
+        end)
+    end
+end
+
+--------------------------------------------------------
+-- H A U P T F U N K T I O N
+--------------------------------------------------------
+local function fixPrompts()
+
+    ----------------------------------------------------
+    -- 1. workspace.Ignore
+    ----------------------------------------------------
+    for _, obj in pairs(workspace.Ignore:GetDescendants()) do
+        if obj:IsA("MeshPart") and obj.Name ~= "SkidMark" then
+            local prompt = obj:FindFirstChild("proxy")
+            triggerPrompt(prompt)
+        end
+    end
+
+    ----------------------------------------------------
+    -- 2. BANK (GeldTisch)
+    ----------------------------------------------------
+    local rob = workspace:FindFirstChild("Rob_Alarm")
+    if rob and rob:FindFirstChild("Robberys") and rob.Robberys:FindFirstChild("Bank") then
+        for _, geldModel in ipairs(rob.Robberys.Bank:GetDescendants()) do
+            if geldModel:IsA("Model") and geldModel.Name == "GeldTisch" then
+                local holder = geldModel:FindFirstChild("ItemHolder")
+                if holder then
+                    for _, mesh in ipairs(holder:GetDescendants()) do
+                        if mesh:IsA("MeshPart") then
+                            local prompt = mesh:FindFirstChild("proxy")
+                            triggerPrompt(prompt)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    ----------------------------------------------------
+    -- 3. JEWELER
+    ----------------------------------------------------
+    if rob and rob.Robberys:FindFirstChild("Jeweler") then
+        local jeweler = rob.Robberys.Jeweler
+        for _, caseModel in ipairs(jeweler:GetChildren()) do
+            if caseModel.Name == "Long" or caseModel.Name == "Short" or caseModel.Name == "Breaked" then
+                local holder = caseModel:FindFirstChild("ItemHolder")
+                if holder then
+                    for _, obj in ipairs(holder:GetDescendants()) do
+                        if obj:IsA("ProximityPrompt") then
+                            triggerPrompt(obj)
+                        elseif obj:IsA("MeshPart") then
+                            local prompt = obj:FindFirstChild("proxy")
+                            triggerPrompt(prompt)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    ----------------------------------------------------
+    -- 4. PACKSTATION
+    ----------------------------------------------------
+    local map = workspace:FindFirstChild("Map")
+    if map and map:FindFirstChild("Packstation") then
+        local packstation = map.Packstation
+        for _, stationModel in ipairs(packstation:GetChildren()) do
+            for _, obj in ipairs(stationModel:GetDescendants()) do
+                if obj:IsA("MeshPart") and obj.Name == "Door" then
+                    local prompt = obj:FindFirstChild("ProximityPrompt")
+                    triggerPrompt(prompt)
+                end
+            end
+        end
+    end
+
+end
+createLabel(Misc1,"Fast Collect (Crazy Update) :")
+--------------------------------------------------------
+-- T O G G L E
+--------------------------------------------------------
+local Toggle = Misc1:CreateToggle({
+    Name = "Fast Collect",
+    CurrentValue = false,
+    Flag = "Toggle_ProximityFix",
+    Callback = function(Value)
+        if Value then
+            connection = RunService.Heartbeat:Connect(fixPrompts)
+        else
+            if connection then
+                connection:Disconnect()
+                connection = nil
+            end
+        end
+    end,
+})
+
+
+createLabel(Misc1,"Toggle Fast Bank Robbery ( You can now open the vault with one click ) :")
+
+local autoSetHoldDuration = false
+local conns = {}
+
+local function setInstant(obj)
+    if obj:IsA("ProximityPrompt") then obj.HoldDuration = 0 end
+end
+
+local function hookSafe(safe)
+    for _, d in ipairs(safe:GetDescendants()) do setInstant(d) end
+    table.insert(conns, safe.DescendantAdded:Connect(setInstant))
+end
+
+local function startFastBank()
+    autoSetHoldDuration = true
+    for _, o in ipairs(workspace:GetDescendants()) do
+        if o:IsA("Model") and (o.Name == "Safe" or o.Name == "Safe2") then hookSafe(o) end
+    end
+    table.insert(conns, workspace.DescendantAdded:Connect(function(o)
+        if o:IsA("Model") and (o.Name == "Safe" or o.Name == "Safe2") then hookSafe(o) end
+        setInstant(o)
+    end))
+
+    print("[Blackair]: Fast Bank Rob On")
+end
+
+local function stopFastBank()
+    autoSetHoldDuration = false
+    for _, c in ipairs(conns) do if c.Connected then c:Disconnect() end end
+    conns = {}
+    print("[Blackair]: Fast Bank Rob Off")
+end
+
+Misc1:CreateToggle({
+    Name = "Fast Bank Rob",
+    CurrentValue = false,
+    Flag = "HoldDurationToggle",
+    Callback = function(v) if v then startFastBank() else stopFastBank() end end,
+})
+
+
+local funn1 = Window:CreateTab("Funny Tap", 6022668881) -- Title, Image
+
+--------------------------------------------------
+-- LABELS
+--------------------------------------------------
+createLabel(funn1,"Toggle Crowbar Destroy :")
+createLabel(funn1,"Click on Wanted-Police cars or Players to Destroy")
+createLabel(funn1,"You need a Crowbar.")
+
+--------------------------------------------------
+-- SERVICES
+--------------------------------------------------
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+--------------------------------------------------
+-- PLAYER
+--------------------------------------------------
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
+
+local character = player.Character or player.CharacterAdded:Wait()
+player.CharacterAdded:Connect(function(char)
+	character = char
+end)
+
+--------------------------------------------------
+-- SETTINGS
+--------------------------------------------------
+local REQUIRED_TOOLNAME = "CrowbarBlue"
+local MAX_DISTANCE = 999999
+
+--------------------------------------------------
+-- STATE
+--------------------------------------------------
+local selectCarMode = false
+local actionTask = nil
+local highlightInstance = nil
+
+--------------------------------------------------
+-- NOTIFY
+--------------------------------------------------
+local function notify(title, text, dur)
+	Rayfield:Notify({
+		Title = title,
+		Content = text,
+		Duration = dur or 5,
+		Image = 4483362458
+	})
+end
+
+--------------------------------------------------
+-- CROWBAR UTILS (NO EQUIP REQUIRED)
+--------------------------------------------------
+local function getCrowbar()
+	-- Equipped
+	if character then
+		for _, t in ipairs(character:GetChildren()) do
+			if t:IsA("Tool") and t:GetAttribute("ToolName") == REQUIRED_TOOLNAME then
+				return t
+			end
+		end
+	end
+
+	-- Backpack
+	for _, t in ipairs(player.Backpack:GetChildren()) do
+		if t:IsA("Tool") and t:GetAttribute("ToolName") == REQUIRED_TOOLNAME then
+			return t
+		end
+	end
+end
+
+--------------------------------------------------
+-- UTILS
+--------------------------------------------------
+local function distanceTo(part)
+	local hrp = character and character:FindFirstChild("HumanoidRootPart")
+	if not hrp or not part then return math.huge end
+	return (hrp.Position - part.Position).Magnitude
+end
+
+--------------------------------------------------
+-- VEHICLE UTILS
+--------------------------------------------------
+local function getMainHitPart(model)
+	for _, p in ipairs(model:GetDescendants()) do
+		if p:IsA("BasePart") then
+			return p
+		end
+	end
+end
+
+local function findVehicleFromPart(part)
+	while part and part.Parent do
+		if part:IsA("Model") and part.Parent == workspace.Vehicles then
+			return part
+		end
+		part = part.Parent
+	end
+end
+
+--------------------------------------------------
+-- TEAM / WANTED CHECK
+--------------------------------------------------
+local function canDestroyVehicle(vehicle)
+	local info = vehicle:FindFirstChild("InfoFolder")
+	if not info then return false end
+
+	local ownerVal = info:FindFirstChild("Owner")
+	if not ownerVal or not ownerVal.Value then return false end
+
+	local owner = ownerVal.Value
+	local isWanted = owner:GetAttribute("IsWanted")
+	local ownerJob = owner:GetAttribute("Job")
+	local myJob = player:GetAttribute("Job") or -1
+
+	-- Police
+	if myJob == 1 then
+		if not isWanted then
+			notify("Denied", "Target not wanted.")
+		end
+		return isWanted == true
+	end
+
+	-- Criminal rules
+	if isWanted or ownerJob == 1 or ownerJob == 8 then
+		return true
+	end
+
+	notify("Denied", "Not allowed to destroy this vehicle.")
+	return false
+end
+
+--------------------------------------------------
+-- HIGHLIGHT
+--------------------------------------------------
+local function highlightModel(model)
+	if highlightInstance then
+		highlightInstance:Destroy()
+	end
+
+	local h = Instance.new("Highlight")
+	h.Adornee = model
+	h.FillTransparency = 1
+	h.OutlineTransparency = 0
+	h.OutlineColor = Color3.fromRGB(255, 0, 0)
+	h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	h.Parent = CoreGui
+
+	highlightInstance = h
+end
+
+--------------------------------------------------
+-- AUTO BREAK VEHICLE
+--------------------------------------------------
+local function breakVehicle(vehicle)
+	if actionTask then
+		task.cancel(actionTask)
+		actionTask = nil
+	end
+
+	local crowbar = getCrowbar()
+	if not crowbar then
+		notify("Error", "Crowbar not found.")
+		return
+	end
+
+	if not canDestroyVehicle(vehicle) then
+		return
+	end
+
+	local hit = getMainHitPart(vehicle)
+	if not hit then
+		notify("Error", "No hit part found.")
+		return
+	end
+
+	highlightModel(vehicle)
+	notify("Vehicle", "Destroying " .. vehicle.Name)
+
+	actionTask = task.spawn(function()
+		while selectCarMode and vehicle.Parent do
+			local status = vehicle:GetAttribute("DamageStatus")
+			if status == "Broke" or status == "Exploded" then
+				notify("Vehicle", vehicle.Name .. " destroyed.")
+				break
+			end
+
+			crowbar.OnDamageEvent:FireServer({{
+				HitType = 2,
+				Model = vehicle,
+				Hit = hit
+			}}, 3)
+
+			task.wait()
+		end
+
+		actionTask = nil
+	end)
+end
+
+--------------------------------------------------
+-- TOGGLE
+--------------------------------------------------
+local Toggle = funn1:CreateToggle({
+	Name = "Crowbar Destroy (Cars)",
+	CurrentValue = false,
+	Flag = "CrowbarDestroy",
+	Callback = function(value)
+		selectCarMode = value
+
+		if not value then
+			if actionTask then
+				task.cancel(actionTask)
+				actionTask = nil
+			end
+			if highlightInstance then
+				highlightInstance:Destroy()
+				highlightInstance = nil
+			end
+			notify("Disabled", "Car Killer disabled.")
+			return
+		end
+
+		local crowbar = getCrowbar()
+		if not crowbar then
+			notify("Error", "Crowbar not found.")
+			Toggle:Set(false)
+			selectCarMode = false
+			return
+		end
+
+		notify("Enabled", "Crowbar detected. Click a wanted car.")
+	end
+})
+--------------------------------------------------
+-- AUTO DAMAGE PLAYER
+--------------------------------------------------
+local function killPlayer(char)
+	if actionTask then task.cancel(actionTask) end
+
+	local hum = char:FindFirstChild("Humanoid")
+	if not hum then
+		notify("Error", "No Humanoid found.")
+		return
+	end
+
+	local crowbar = getCrowbar()
+	if not crowbar then
+		notify("Error", "Crowbar missing.")
+		return
+	end
+
+	local hit = char:FindFirstChild("RightUpperLeg") or char:FindFirstChild("HumanoidRootPart")
+	if not hit then
+		notify("Error", "No valid hit part.")
+		return
+	end
+
+	highlightModel(char)
+	notify("Player", "Attacking " .. char.Name)
+
+	actionTask = task.spawn(function()
+		while selectCarMode and hum.Health > 1 do
+			crowbar.OnDamageEvent:FireServer({{
+				HitType = 1,
+				Model = char,
+				Hit = hit
+			}},2)
+			task.wait()
+		end
+
+		notify("Player", char.Name .. " neutralized.")
+		actionTask = nil
+	end)
+end
+
+--------------------------------------------------
+-- CLICK HANDLER
+--------------------------------------------------
+mouse.Button1Down:Connect(function()
+	if not selectCarMode then return end
+
+	local target = mouse.Target
+	if not target then
+		notify("Error", "No target.")
+		return
+	end
+
+	-- PLAYER
+	local char = target:FindFirstAncestorOfClass("Model")
+	if char and char.Parent == workspace.Characters and char:FindFirstChild("Humanoid") then
+		local hrp = char:FindFirstChild("HumanoidRootPart")
+		if not hrp or distanceTo(hrp) > MAX_DISTANCE then
+			notify("Error", "Player too far away.")
+			return
+		end
+		killPlayer(char)
+		return
+	end
+
+	-- VEHICLE
+	local vehicle = findVehicleFromPart(target)
+	if not vehicle then
+		notify("Error", "No vehicle found.")
+		return
+	end
+
+	local hit = getMainHitPart(vehicle)
+	if distanceTo(hit) > MAX_DISTANCE then
+		notify("Error", "Vehicle too far away.")
+		return
+	end
+
+	if not canDestroyVehicle(vehicle) then return end
+	breakVehicle(vehicle)
+end)
+
+createLabel(funn1,"Teleport All Wanted and All Police Cars To you. ")
+createLabel(funn1,"Use Car Destroyer. ")
+
+local Button = funn1:CreateButton({
+   Name = "Teleport Wanted & Police Cars",
+   Callback = function()
+
+        local Players = game:GetService("Players")
+        local LocalPlayer = Players.LocalPlayer
+
+        local vehiclesFolder = workspace:FindFirstChild("Vehicles")
+        if not vehiclesFolder then
+            warn("Vehicles Ordner nicht gefunden!")
+            return
+        end
+
+        local function waitForCharacter(player)
+            if player.Character then
+                return player.Character
+            end
+            return player.CharacterAdded:Wait()
+        end
+
+        local myCharacter = waitForCharacter(LocalPlayer)
+        local myRoot = myCharacter:WaitForChild("HumanoidRootPart")
+
+        ---------------------------------------------------
+        -- Check ob Spieler Wanted oder Cop ist
+        ---------------------------------------------------
+        local function isTargetPlayer(player)
+            if not player then return false end
+            if player.Character and player.Character:GetAttribute("IsWanted") == true then
+                return true
+            end
+            local job = player:GetAttribute("Job")
+            if job == 1 or job == 8 then
+                return true
+            end
+            return false
+        end
+
+        ---------------------------------------------------
+        -- Anchor / Unanchor Funktion
+        ---------------------------------------------------
+        local function setAnchored(model, state)
+            for _, part in pairs(model:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = state
+                end
+            end
+        end
+
+        ---------------------------------------------------
+        -- Linie Setup
+        ---------------------------------------------------
+        local spacing = 10 -- Abstand zwischen Autos
+        local index = 0    -- Position in der Reihe
+
+        for _, vehicle in pairs(vehiclesFolder:GetChildren()) do
+
+            -- Exploded sofort ignorieren
+            if vehicle:GetAttribute("DamageStatus") == "Exploded" then
+                setAnchored(vehicle, false)
+                continue
+            end
+
+            local infoFolder = vehicle:FindFirstChild("InfoFolder")
+            if not infoFolder then continue end
+
+            local ownerValue = infoFolder:FindFirstChild("Owner")
+            if not ownerValue then continue end
+
+            local ownerPlayer = nil
+            if ownerValue:IsA("StringValue") then
+                ownerPlayer = Players:FindFirstChild(ownerValue.Value)
+            elseif ownerValue:IsA("ObjectValue") then
+                ownerPlayer = ownerValue.Value
+            end
+
+            -- Live Explosion Detection
+            vehicle:GetAttributeChangedSignal("DamageStatus"):Connect(function()
+                if vehicle:GetAttribute("DamageStatus") == "Exploded" then
+                    setAnchored(vehicle, false)
+                end
+            end)
+
+            -- Wanted / Police TP
+            if ownerPlayer and isTargetPlayer(ownerPlayer) then
+
+                -- Linie von links nach rechts vor dir
+                local offset = Vector3.new(index * spacing, 0, -15)
+                local targetCFrame = myRoot.CFrame + offset
+
+                if vehicle.PrimaryPart then
+                    vehicle:SetPrimaryPartCFrame(targetCFrame)
+                else
+                    local firstPart = vehicle:FindFirstChildWhichIsA("BasePart")
+                    if firstPart then
+                        firstPart.CFrame = targetCFrame
+                    end
+                end
+
+                setAnchored(vehicle, true)
+                index = index + 1 -- nächstes Auto weiter rechts
+            end
+        end
+   end,
+})
+
+
+ local teleportTab = Window:CreateTab("Teleport", 6022668901) -- Title, Image
+
+createLabel(teleportTab,"Teleport To Nearest Dealer")
+ local workspace = game:GetService("Workspace")
+ 
+ -- Funktion: Auto schnell vor den Spieler teleportieren
+ function teleportCarCloseToPlayer(car, player)
+     local character = player.Character
+     if not character then
+         warn("[BlackAir]: Player character not found!")
+         return
+     end
+ 
+     local rootPart = character:FindFirstChild("HumanoidRootPart")
+     if not rootPart then
+         warn("[BlackAir]: No HumanoidRootPart found!")
+         return
+     end
+ 
+     -- Position vor dem Spieler berechnen (5 Studs)
+     local frontOffset = rootPart.CFrame.LookVector * 5
+     local targetPosition = rootPart.Position + frontOffset
+ 
+     -- Alle Teile anchorn
+     for _, part in pairs(car:GetDescendants()) do
+         if part:IsA("BasePart") then
+             part.Anchored = true
+         end
+     end
+ 
+     -- Schnell teleportieren
+     car:PivotTo(CFrame.new(targetPosition))
+ 
+     wait(0.1)
+ 
+     -- Wieder unanchorn
+     for _, part in pairs(car:GetDescendants()) do
+         if part:IsA("BasePart") then
+             part.Anchored = false
+         end
+     end
+ 
+     print("[BlackAir]: Car teleported in front of player")
+ end
+ 
+ -- Funktion: Auto vor Dummy teleportieren (in 3 Steps mit Anchor)
+ function teleportCarToCoordinates3(car, dummy)
+     if not dummy or not dummy:FindFirstChild("HumanoidRootPart") then
+         return
+     end
+ 
+     local root = dummy.HumanoidRootPart
+     local dummyOrientation = root.CFrame.LookVector
+     local inFrontPosition = root.Position + dummyOrientation * 10
+ 
+     local upOffset = Vector3.new(0, 300, 0)
+     local startUp = car:GetModelCFrame().Position + upOffset
+     local midFlat = Vector3.new(inFrontPosition.X, startUp.Y, inFrontPosition.Z)
+ 
+     for _, v in pairs(car:GetDescendants()) do
+         if v:IsA("BasePart") then
+             v.Anchored = true
+         end
+     end
+ 
+     wait(0.1)
+     car:PivotTo(CFrame.new(startUp))
+     wait(0.3)
+     car:PivotTo(CFrame.new(midFlat))
+     wait(0.3)
+     car:PivotTo(CFrame.new(inFrontPosition))
+     wait(0.3)
+ 
+     for _, v in pairs(car:GetDescendants()) do
+         if v:IsA("BasePart") then
+             v.Anchored = false
+         end
+     end
+ 
+     print("[BlackAir]: Car safely teleported to Dealer")
+ end
+ 
+ -- Funktion: Nächsten Dummy finden
+ function findNearestDummy()
+     local nearestDummy = nil
+     local shortestDistance = math.huge
+ 
+     for _, model in pairs(workspace:WaitForChild("Ignore"):GetChildren()) do
+         if model:IsA("Model") and model.Name == "Dummy" and model:FindFirstChild("HumanoidRootPart") then
+             local distance = (player.Character.HumanoidRootPart.Position - model.HumanoidRootPart.Position).Magnitude
+             if distance < shortestDistance then
+                 shortestDistance = distance
+                 nearestDummy = model
+             end
+         end
+     end
+ 
+     return nearestDummy
+ end
+ 
+ -- Funktion: Auto nehmen, fahren, zu Dummy TP und aussteigen
+ function teleportAndDriveCar3(destination, dummy)
+     local car = findPlayerCar()
+     if car then
+         unlockVehicle(car)
+         wait(0.5)
+         -- Auto schnell vor Spieler teleportieren
+         teleportCarCloseToPlayer(car, player)
+ 
+         wait(0.2)
+ 
+         sitInCar(car)
+ 
+         wait(0.5)
+ 
+         teleportCarToCoordinates3(car, dummy)
+ 
+         wait(0.5)
+ 
+         exitCar()
+     else
+         -- Car NICHT gefunden → Rayfield Notification
+         Rayfield:Notify({
+             Title = "BlackAir Error",
+             Content = "Car not found or is not nearby!",
+             Duration = 5,
+             Image = 4483362458
+         })
+         warn("[BlackAir]: No Car Found For Player")
+         print("-------------------------------------")
+     end
+ end
+ 
+ -- Button-Aktion: Zu nächstem Dummy teleportieren
+ function teleportToNearestDummy()
+     local dummy = findNearestDummy()
+     if dummy then
+         teleportAndDriveCar3(dummy.HumanoidRootPart.Position, dummy)
+     else
+                 -- Car NICHT gefunden → Rayfield Notification
+                 Rayfield:Notify({
+                    Title = "BlackAir Error",
+                    Content = "No Dealer Found or is not nearby! ",
+                    Duration = 5,
+                    Image = 4483362458
+                })
+     end
+ end
+ 
+ -- UI Button
+ local Button = teleportTab:CreateButton({
+     Name = "teleport To Nearest Dealer",
+     Callback = function()
+         teleportToNearestDummy()
+     end,
+ }) 
+ 
+createLabel(teleportTab, "Teleports :")
+
+ local Dropdown = teleportTab:CreateDropdown({
+    Name = "Rob Teleports",
+    Options = {"Test", "Jeweler", "Bank", "Bank V2", "COUNT Gas Station 1", "COUNT Gas Station 2", "COUNT Gas Station 3", "Moon Gas Station", "House 1", "House 2", "House 3"},
+    CurrentOption = {"Press"},
+    MultipleOptions = false,
+    Flag = "Dropdown1",
+    Callback = function(value)
+        -- Da MultipleOptions = false ist, sollte value eine Tabelle mit nur einem Element sein.
+        local selectedValue = value[1] -- Nimm das erste Element aus dem Table
+
+        -- Debugging: Ausgabe des zurückgegebenen Wertes
+        print("Selected Location: " .. selectedValue)
+
+        local selectedLocation = RobLocations1[selectedValue]
+        
+        if selectedLocation then
+            teleportAndDriveCar(selectedLocation)  -- Verwende die Funktion teleportAndDriveCar
+            print("[BlackAir]: teleporting to: " .. selectedValue)
+            print("-------------------------------------")
+        else
+            print("[BlackAir]: Invalid location selected! / Car Gone?!")
+            print("-------------------------------------")
+        end
+    end,
+})
+
+ local Dropdown = teleportTab:CreateDropdown({
+    Name = "Packstation",
+    Options = {"Gun Tuner Packstation", "Hospital Packstation", "Gas Station PackstationGas Station Packstation", "Police Packstation", "Car Spawner Packstation", "Fire Department Packstation", "House Packstation", "D.A.C.E Packstation", "OPI Packstation"},
+    CurrentOption = {"Press"},
+    MultipleOptions = false,
+    Flag = "Dropdown1",
+    Callback = function(value)
+        -- Da MultipleOptions = false ist, sollte value eine Tabelle mit nur einem Element sein.
+        local selectedValue = value[1] -- Nimm das erste Element aus dem Table
+
+        -- Debugging: Ausgabe des zurückgegebenen Wertes
+        print("Selected Location: " .. selectedValue)
+
+        local selectedLocation = Packstation[selectedValue]
+        
+        if selectedLocation then
+            teleportAndDriveCar(selectedLocation)  -- Verwende die Funktion teleportAndDriveCar
+            print("[BlackAir]: teleporting to: " .. selectedValue)
+            print("-------------------------------------")
+        else
+            print("[BlackAir]: Invalid location selected! / Car Gone?!")
+            print("-------------------------------------")
+        end
+    end,
+})
+
+-- Dropdown für Teleports (ROB STUFF) mit Teleportation
+local Dropdown = teleportTab:CreateDropdown({
+    Name = "Map Teleports",
+    Default = "Select Location",
+    Options = {"D.A.C.E", "Vehicle Spawn", "SkinShop", "Helipad", "RoboZon", "Döner Shop", "Ship Spawn", "Bus Depot", "Phamacy", "Merch Store", "Drone Store", "Toolshop", "Fire Department", "Hospital", "Vehicle Shop", "Police", "Markt", "Car Tuner"},
+    CurrentOption = {"Press"},
+    MultipleOptions = false,
+    Flag = "Dropdown1",
+    Callback = function(value)
+        -- Da MultipleOptions = false ist, sollte value eine Tabelle mit nur einem Element sein.
+        local selectedValue = value[1] -- Nimm das erste Element aus dem Table
+
+        -- Debugging: Ausgabe des zurückgegebenen Wertes
+        print("Selected Location: " .. selectedValue)
+
+        local selectedLocation = teleportLocations[selectedValue]
+        
+        if selectedLocation then
+            teleportAndDriveCar(selectedLocation)  -- Verwende die Funktion teleportAndDriveCar
+            print("[BlackAir]: teleporting to: " .. selectedValue)
+            print("-------------------------------------")
+        else
+            print("[BlackAir]: Invalid location selected! / Car Gone?!")
+            print("-------------------------------------")
+        end
+    end,
+})
+
+createLabel(teleportTab,"Teleports :")
+local function findNearestPlayerByCondition(cond)
+    local nearest, dist = nil, math.huge
+    for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+            local attr = p:GetAttributes()
+            if cond(attr) then
+                local d = (player.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                if d < dist then
+                    dist, nearest = d, p
+                end
+            end
+        end
+    end
+    return nearest
+end
+
+local function teleportToNearestPlayerByCondition(cond, label)
+    local target = findNearestPlayerByCondition(cond)
+    if target then
+        local car = findPlayerCar()
+        if car then
+            unlockVehicle(car)
+            wait(0.3)
+            teleportCarCloseToPlayer(car, player)
+            wait(0.3)
+            sitInCar(car)
+            wait(0.4)
+            teleportCarCloseToPlayer(car, target)
+            wait(0.5)
+            exitCar()
+            print("[BlackAir]: Car teleported to nearest " .. label)
+        else
+            Rayfield:Notify({
+                Title = "BlackAir Error",
+                Content = "No car found!",
+                Duration = 4,
+                Image = 4483362458
+            })
+        end
+    else
+        Rayfield:Notify({
+            Title = "BlackAir Info",
+            Content = "No " .. label .. " found nearby!",
+            Duration = 4,
+            Image = 4483362458
+        })
+    end
+end
+
+-- Button 1: Nearest Wanted Player
+teleportTab:CreateButton({
+    Name = "TP to Nearest Wanted Player",
+    Callback = function()
+        teleportToNearestPlayerByCondition(function(a)
+            return a.IsWanted == true
+        end, "wanted player")
+    end,
+})
+
+-- Button 2: Nearest Police Player
+teleportTab:CreateButton({
+    Name = "TP to Nearest Police Player",
+    Callback = function()
+        teleportToNearestPlayerByCondition(function(a)
+            return a.Job == 1
+        end, "police player")
+    end,
+})
+
+local aimbotTab = Window:CreateTab("Combat", 6026568213) -- Title, Image
+
+createLabel(aimbotTab,"Toggel Aimbot :")
+--// SERVICES //
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+--// CONFIG //
+local aimPartName = "Head"
+local aimbotActive = false
+local fovRadius = 150
+local isRightClickHeld = false
+local fovColor = Color3.fromRGB(255, 255, 255)
+
+--// CLEANUP EXISTING FOV CIRCLE //
+if _G.AIMBOT_FOV_CIRCLE then
+    pcall(function()
+        _G.AIMBOT_FOV_CIRCLE:Remove()
+    end)
+    _G.AIMBOT_FOV_CIRCLE = nil
+end
+
+--// FOV CIRCLE //
+local fovCircle = Drawing.new("Circle")
+_G.AIMBOT_FOV_CIRCLE = fovCircle
+fovCircle.Color = fovColor
+fovCircle.Thickness = 1
+fovCircle.NumSides = 64
+fovCircle.Radius = fovRadius
+fovCircle.Filled = false
+fovCircle.Visible = false
+
+--// NOTIFY FUNCTION //
+local function notify(title, content)
+    pcall(function()
+        Rayfield:Notify({
+            Title = title,
+            Content = content,
+            Duration = 6.5,
+            Image = 4483362458,
+        })
+    end)
+end
+
+--// KEYBIND UI (V) //
+local Keybind = aimbotTab:CreateKeybind({
+    Name = "Aimbot Toggle",
+    CurrentKeybind = "V",
+    HoldToInteract = false,
+    Flag = "AimbotKeybind",
+    Callback = function()
+        aimbotActive = not aimbotActive
+        if fovCircle then
+            fovCircle.Visible = aimbotActive
+        end
+        if aimbotActive then
+            notify("Aimbot", "Aimbot Is On")
+        else
+            notify("Aimbot", "Aimbot Is Off")
+        end
+    end,
+})
+
+--// RIGHT CLICK DETECTION //
+UserInputService.InputBegan:Connect(function(input, processed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        isRightClickHeld = true
+    end
+end)
+UserInputService.InputEnded:Connect(function(input, processed)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        isRightClickHeld = false
+    end
+end)
+
+--// SLIDER FOR FOV SIZE //
+local Slider = aimbotTab:CreateSlider({
+    Name = "Aimbot FOV",
+    Range = {50, 500},
+    Increment = 10,
+    Suffix = "px",
+    CurrentValue = fovRadius,
+    Flag = "FOVSlider",
+    Callback = function(Value)
+        fovRadius = Value
+        if fovCircle then
+            fovCircle.Radius = Value
+        end
+    end,
+})
+
+--// AIM PART DROPDOWN //
+local Dropdown = aimbotTab:CreateDropdown({
+    Name = "Aim Part",
+    Options = {"Head", "HumanoidRootPart"},
+    CurrentOption = {"Head"},
+    MultipleOptions = false,
+    Flag = "AimPartDropdown",
+    Callback = function(Options)
+        aimPartName = Options[1]
+    end,
+})
+
+--// COLOR PICKER FOR FOV //
+local ColorPicker = aimbotTab:CreateColorPicker({
+    Name = "FOV Color",
+    Color = fovColor,
+    Flag = "ColorPicker1",
+    Callback = function(Value)
+        fovColor = Value
+        if fovCircle then
+            fovCircle.Color = Value
+        end
+    end,
+})
+
+--// CLOSEST ENEMY IN FOV //
+local function getClosestTarget()
+    local closestPlayer = nil
+    local shortestDistance = math.huge
+    local mouseLocation = UserInputService:GetMouseLocation()
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild(aimPartName) then
+            local part = player.Character[aimPartName]
+            local screenPos, onScreen = Camera:WorldToViewportPoint(part.Position)
+
+            if onScreen then
+                local dist = (Vector2.new(screenPos.X, screenPos.Y) - mouseLocation).Magnitude
+                if dist < fovRadius and dist < shortestDistance then
+                    closestPlayer = player
+                    shortestDistance = dist
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+--// 3D ESP HIGHLIGHT BOX //
+local function createESPBox(target)
+    local torso = target.Character and target.Character:FindFirstChild("HumanoidRootPart")
+    if not torso then return end
+
+    local existing = torso:FindFirstChild("AIM_ESP")
+    if existing then
+        existing:Destroy()
+    end
+
+    local part = Instance.new("BoxHandleAdornment")
+    part.Name = "AIM_ESP"
+    part.Size = Vector3.new(0.5, 0.5, 0.5)
+    part.Color3 = Color3.new(0.607843, 0.054902, 0.470588)
+    part.Transparency = 0.25
+    part.ZIndex = 5
+    part.AlwaysOnTop = true
+    part.Adornee = torso
+    part.Parent = torso
+
+    task.delay(0.2, function()
+        if part then
+            part:Destroy()
+        end
+    end)
+end
+
+--// MAIN LOOP //
+RunService.RenderStepped:Connect(function()
+    if not aimbotActive then
+        if fovCircle then
+            fovCircle.Visible = false
+        end
+        return
+    end
+
+    local mouseLocation = UserInputService:GetMouseLocation()
+    if fovCircle then
+        fovCircle.Position = mouseLocation
+        fovCircle.Radius = fovRadius
+        fovCircle.Visible = true
+    end
+
+    if isRightClickHeld then
+        local target = getClosestTarget()
+        if target and target.Character then
+            local aimPart = target.Character:FindFirstChild(aimPartName)
+            if aimPart then
+                local targetPos = aimPart.Position
+                local camPos = Camera.CFrame.Position
+                Camera.CFrame = CFrame.new(camPos, targetPos)
+                createESPBox(target)
+            end
+        end
+    end    
+end)
+
+local PoliceTap = Window:CreateTab("Police", 6022668898)
+
+createLabel(PoliceTap,"Police Stuff")
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+
+local Workspace = game:GetService("Workspace")
+local Range = 20
+local active = false
+local cuffToolName = nil
+local collected = {}
+
+-- === Jail Positionen ===
+local jailStagingPos = Vector3.new(-3297.18, 44.61, -405.79)
+local jailTeleportPos = Vector3.new(-3300.31, 47.44, -432.82)
+local returnPos = Vector3.new(-171.16, 71.66, 811.28)
+
+-- === Tool Finden ===
+function findCuffToolName()
+    local backpack = LocalPlayer:WaitForChild("Backpack")
+    for _, tool in pairs(backpack:GetChildren()) do
+        if tool:FindFirstChild("OnHandCuffing") then
+            return tool.Name
+        end
+    end
+    return nil
+end
+
+function equipTool2(name)
+    local backpack = LocalPlayer:WaitForChild("Backpack")
+    local tool = backpack:FindFirstChild(name)
+    if tool then
+        tool.Parent = LocalPlayer.Character
+    end
+end
+
+local function getJailRemote()
+    local client = ReplicatedStorage:FindFirstChild("Client")
+    if not client then return nil end
+
+    local comm = client:FindFirstChild("Communication")
+    if not comm then return nil end
+
+    local remote = comm:FindFirstChild("OnJailing")
+    return remote
+end
+
+
+function jailPlayer(char)
+    if not char then return end
+
+    local remote = getJailRemote()
+    if not remote then
+        warn("[Auto Arrest]: OnJailing Remote nicht gefunden")
+        return
+    end
+
+    if remote:IsA("RemoteFunction") then
+        remote:InvokeServer(char)
+    elseif remote:IsA("RemoteEvent") then
+        remote:FireServer(char)
+    else
+        warn("[Auto Arrest]: gg?")
+    end
+end
+
+
+-- === Nearby Wanted Check ===
+function getNearbyWantedPlayers()
+    local wantedPlayers = {}
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local char = Workspace:FindFirstChild("Characters"):FindFirstChild(player.Name)
+            if char and char:GetAttribute("IsWanted") == true then
+                local dist = (char:GetPivot().Position - LocalPlayer.Character:GetPivot().Position).Magnitude
+                if dist <= Range then
+                    table.insert(wantedPlayers, player)
+                end
+            end
+        end
+    end
+    return wantedPlayers
+end
+
+function cuffPlayer(targetChar, player)
+    local tool = LocalPlayer.Character:FindFirstChild(cuffToolName)
+    if tool and tool:FindFirstChild("OnHandCuffing") then
+        tool.OnHandCuffing:FireServer("hc", targetChar)
+        if not table.find(collected, player.Name) then
+            table.insert(collected, player.Name)
+        end
+    end
+end
+
+-- === Teleport-Funktion für den Spieler oder das Auto ===
+function teleportLocalPlayerTo(pos, useCar)
+    local char = Workspace:FindFirstChild("Characters"):FindFirstChild(LocalPlayer.Name)
+
+    if useCar then
+        -- Wenn das Auto verwendet werden soll, suchen wir das Auto des Spielers
+        local car = findPlayerCar()
+        if car then
+            -- Auto teleportieren
+            teleportCarToCoordinates(car, pos)
+        else
+            warn("[BlackAir]: Kein Auto gefunden für den Spieler.")
+        end
+    else
+        -- Andernfalls den Spieler teleportieren
+        if char then
+            char:PivotTo(CFrame.new(pos))
+        end
+    end
+end
+
+-- === Jail All ===
+function jailAll()
+    -- Teleportiere LocalPlayer zum Jail Staging Position mit Fahrzeug
+    teleportAndDriveCar(jailStagingPos)
+    task.wait(0.5)
+
+    -- Teleportiere den LocalPlayer zum Jail (Spieler TP)
+    teleportLocalPlayerTo(jailTeleportPos)
+    task.wait(0.5)
+
+    -- Alle gesammelten Spieler ins Gefängnis schicken
+    for _, playerName in ipairs(collected) do
+        local char = Workspace:FindFirstChild("Characters"):FindFirstChild(playerName)
+        if char then
+            jailPlayer(char)
+            print("[Auto Arrest]: " .. playerName .. " jailed.")
+            task.wait(0.3)
+        end
+    end
+
+    collected = {}
+
+    -- Rückkehr zum ursprünglichen Punkt mit Fahrzeug
+    teleportAndDriveCar(returnPos)
+    print("[Auto Arrest]: Rückfahrt abgeschlossen.")
+    
+    -- Alle Spieler in der Nähe ins Gefängnis schicken
+    local nearbyPlayers = getNearbyWantedPlayers()
+    for _, player in ipairs(nearbyPlayers) do
+        local char = Workspace:FindFirstChild("Characters"):FindFirstChild(player.Name)
+        if char then
+            jailPlayer(char)
+            print("[Auto Arrest]: " .. player.Name .. " jailed from proximity.")
+            task.wait(0.3)
+        end
+    end
+end
+task.spawn(function()
+    while true do
+        if active then
+            if not cuffToolName then
+                cuffToolName = findCuffToolName()
+            end
+
+            if cuffToolName and not LocalPlayer.Character:FindFirstChild(cuffToolName) then
+                equipTool2(cuffToolName)
+            end
+
+            local nearby = getNearbyWantedPlayers()
+            for _, player in pairs(nearby) do
+                local char = Workspace:FindFirstChild("Characters"):FindFirstChild(player.Name)
+                if char then
+                    cuffPlayer(char, player)
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+local Toggle = PoliceTap:CreateToggle({
+    Name = "Automatically arrest all Nerast players",
+    CurrentValue = false,
+    Flag = "AutoArrest",
+    Callback = function(Value)
+        active = Value
+        print("[AutoArrest]: " .. (Value and "Aktiviert" or "Deaktiviert"))
+    end,
+})
+
+local Button = PoliceTap:CreateButton({
+    Name = "Jail all cuffed players",
+    Callback = function()
+        jailAll()
+    end,
+})
+function teleportLocalPlayerTo(pos)
+    local char = Workspace:FindFirstChild("Characters"):FindFirstChild(LocalPlayer.Name)
+    if char then
+        char:PivotTo(CFrame.new(pos))
+    end
+end
+
+local Settings = Window:CreateTab("Settings", 6022668898) -- Title, Image
+createLabel(Settings,"Gui Colors :")
+local Dropdown = Settings:CreateDropdown({
+    Name = "Themes",
+    Options = {"Ocean","Default","AmberGlow","Amethyst","Bloom","DarkBlue","Green","Light","Serenity"},
+    CurrentOption = {"Serenity"},
+    MultipleOptions = false,
+    Flag = "Dropdown1",
+    Callback = function(Options)
+    Window.ModifyTheme(Options[1])
+    end,
+ })
+createLabel(Settings,"Rejoin :")
+ local Button = Settings:CreateButton({
+     Name = "Rejoin",
+     Callback = function()
+ -- Rejoin-Skript
+ 
+ local TeleportService = game:GetService("TeleportService")
+ local player = game.Players.LocalPlayer
+ 
+ -- Funktion zum erneuten Beitreten des aktuellen Spiels
+ local function rejoinGame()
+     TeleportService:Teleport(game.PlaceId, player)
+ end
+ -- Rejoin ausführen
+ rejoinGame()
+     end
+ })
+
+local player = game.Players.LocalPlayer
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local playerGui = player:WaitForChild("PlayerGui")
+
+if playerGui:FindFirstChild("WatermarkGui") then return end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WatermarkGui"
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
+
+-- UIScale for consistent scaling
+local uiScale = Instance.new("UIScale")
+uiScale.Parent = screenGui
+
+local function adjustWatermarkScale()
+    local screenSize = workspace.CurrentCamera.ViewportSize
+    uiScale.Scale = screenSize.X < 1000 and 0.7 or 1
+end
+
+adjustWatermarkScale()
+RunService.Heartbeat:Connect(adjustWatermarkScale)
+
+-- Main Watermark Frame (WINTER FROST)
+local watermarkFrame = Instance.new("Frame")
+watermarkFrame.Size = UDim2.new(0, 450, 0, 60)
+watermarkFrame.Position = UDim2.new(0, 10, 1, 20)
+watermarkFrame.BackgroundColor3 = Color3.fromRGB(18, 20, 26)
+watermarkFrame.BackgroundTransparency = 0.15
+watermarkFrame.BorderSizePixel = 0
+watermarkFrame.Parent = screenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0.15, 0)
+UICorner.Parent = watermarkFrame
+
+-- Frost Gradient
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 12, 16)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 90, 130)) -- Ice blue
+}
+gradient.Rotation = 90
+gradient.Parent = watermarkFrame
+
+-- Watermark Label
+local watermarkLabel = Instance.new("TextLabel")
+watermarkLabel.Size = UDim2.new(1, -20, 1, -20)
+watermarkLabel.Position = UDim2.new(0, 10, 0, 10)
+watermarkLabel.BackgroundTransparency = 1
+watermarkLabel.Text = "BLACKAIR® | V4"
+watermarkLabel.TextColor3 = Color3.fromRGB(220, 230, 255)
+watermarkLabel.TextSize = 28
+watermarkLabel.Font = Enum.Font.GothamBold
+watermarkLabel.TextStrokeTransparency = 0.65
+watermarkLabel.TextScaled = true
+watermarkLabel.Parent = watermarkFrame
+
+-- ICE GLOW
+local glow = Instance.new("ImageLabel")
+glow.Name = "Glow"
+glow.Size = UDim2.new(1, 6, 1, 6)
+glow.Position = UDim2.new(0, -3, 0, -3)
+glow.BackgroundTransparency = 1
+glow.Image = "rbxassetid://5028857084"
+glow.ImageColor3 = Color3.fromRGB(180, 210, 255)
+glow.ImageTransparency = 0.88
+glow.ZIndex = watermarkFrame.ZIndex - 1
+glow.Parent = watermarkFrame
+
+-- Snow Particles
+local particleFrame = Instance.new("Frame")
+particleFrame.Size = UDim2.new(1, 0, 1, 0)
+particleFrame.BackgroundTransparency = 1
+particleFrame.ClipsDescendants = true
+particleFrame.Parent = watermarkFrame
+
+local function createParticle()
+    local particle = Instance.new("Frame")
+    local size = math.random(2,6)
+    particle.Size = UDim2.new(0, size, 0, size * 3)
+    particle.Position = UDim2.new(math.random(), 0, -0.2, 0)
+    particle.BackgroundColor3 = Color3.fromRGB(180, 220, 255)
+    particle.BackgroundTransparency = 0.78
+    particle.ZIndex = 2
+    particle.Parent = particleFrame
+
+    local particleCorner = Instance.new("UICorner")
+    particleCorner.CornerRadius = UDim.new(0.5, 0)
+    particleCorner.Parent = particle
+
+    local endPosition = UDim2.new(particle.Position.X.Scale, 0, 1.2, 0)
+    local tween = TweenService:Create(particle, TweenInfo.new(math.random(3,5), Enum.EasingStyle.Linear), {Position = endPosition})
+    tween:Play()
+    tween.Completed:Connect(function() particle:Destroy() end)
+end
+
+task.spawn(function()
+    while true do
+        createParticle()
+        task.wait(0.25)
+    end
+end)
+
+-- Load sound (only once)
+local loadSound = Instance.new("Sound")
+loadSound.SoundId = "rbxassetid://17582299860"
+loadSound.Volume = 1
+loadSound.Parent = screenGui
+loadSound:Play()
+
+-- Animation Function
+local function showWatermark()
+    watermarkLabel.TextTransparency = 1
+    watermarkFrame.Position = UDim2.new(0, 10, 1, 20)
+    watermarkFrame.Visible = true
+
+    watermarkFrame.Size = UDim2.new(0, 0, 0, 0)
+    local tween = TweenService:Create(
+        watermarkFrame,
+        TweenInfo.new(0.7, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+        {Size = UDim2.new(0,450,0,60), Position = UDim2.new(0,10,1,-80)}
+    )
+    tween:Play()
+
+    local fadeTween = TweenService:Create(
+        watermarkLabel,
+        TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+        {TextTransparency = 0}
+    )
+    fadeTween:Play()
+
+    fadeTween.Completed:Wait()
+    task.wait(3)
+
+    local fadeOutTween = TweenService:Create(
+        watermarkLabel,
+        TweenInfo.new(0.7, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+        {TextTransparency = 1}
+    )
+    fadeOutTween:Play()
+
+    local slideOutTween = TweenService:Create(
+        watermarkFrame,
+        TweenInfo.new(0.7, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+        {Position = UDim2.new(0,10,1,20)}
+    )
+    slideOutTween:Play()
+
+    fadeOutTween.Completed:Wait()
+    watermarkFrame.Visible = false
+end
+
+task.spawn(function()
+    while true do
+        showWatermark()
+        task.wait(5)
+    end
+end)
