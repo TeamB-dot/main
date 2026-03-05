@@ -3,7 +3,7 @@ if queueonteleport then
         if not game:IsLoaded() then game.Loaded:Wait() end
         task.wait(2)
 
-        loadstring(game:HttpGet("https://pastebin.com/raw/DEINSCRIPT"))()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TeamB-dot/main/refs/heads/main/fawfwafg"))()
     ]])
 end
 
