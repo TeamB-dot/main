@@ -1,4 +1,18 @@
-local player = game.Players.LocalPlayer
+if queueonteleport then
+    queueonteleport([[
+        if not game:IsLoaded() then game.Loaded:Wait() end
+        task.wait(2)
+
+        loadstring(game:HttpGet("https://pastebin.com/raw/DEINSCRIPT"))()
+    ]])
+end
+
+
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
@@ -14,59 +28,77 @@ local folders = {
 
 local processed = {}
 
-local function renameFolder(folder)
-	local i = 1
-	for _,model in ipairs(folder:GetChildren()) do
-		if model:IsA("Model") then
-			model.Name = tostring(i)
-			i += 1
-		end
-	end
-end
-
 local function tpAndLoot(model)
 	if processed[model] then return end
-	if not model.Parent then return end
-	
 	processed[model] = true
-	
+
 	local part = model:FindFirstChildWhichIsA("BasePart", true)
 	if not part then return end
-	
+
 	hrp.CFrame = part.CFrame + Vector3.new(0,3,0)
-	task.wait(0.15)
-	
+	task.wait(0.2)
+
 	local remote = model:FindFirstChild("GiveLoot", true)
 	if remote then
 		remote:FireServer()
 	end
 end
 
-local function scanFolder(folder)
-	renameFolder(folder)
-	
-	for _,model in ipairs(folder:GetChildren()) do
-		if model:IsA("Model") then
-			tpAndLoot(model)
-			task.wait(0.05)
+local function scan()
+	for _,folder in ipairs(folders) do
+		for _,model in ipairs(folder:GetChildren()) do
+			if model:IsA("Model") then
+				tpAndLoot(model)
+				task.wait(0.05)
+			end
 		end
 	end
 end
 
--- initial scan
-for _,folder in ipairs(folders) do
-	scanFolder(folder)
+
+-- SERVER HOP FUNCTION
+local function serverHop()
+
+	local PlaceID = game.PlaceId
+	local JobID = game.JobId
+
+	local req = game:HttpGet(
+		"https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"
+	)
+
+	local data = HttpService:JSONDecode(req)
+
+	for _,server in pairs(data.data) do
+		if server.playing < server.maxPlayers and server.id ~= JobID then
+			TeleportService:TeleportToPlaceInstance(
+				PlaceID,
+				server.id,
+				player
+			)
+			break
+		end
+	end
 end
 
--- detect new containers
-for _,folder in ipairs(folders) do
-	folder.ChildAdded:Connect(function(child)
-		task.wait(0.2)
-		renameFolder(folder)
-		tpAndLoot(child)
-	end)
 
-	folder.ChildRemoved:Connect(function(child)
-		processed[child] = nil
-	end)
+-- MAIN LOOP
+while true do
+
+	scan()
+
+	task.wait(3)
+
+	local found = false
+
+	for _,folder in ipairs(folders) do
+		if #folder:GetChildren() > 0 then
+			found = true
+		end
+	end
+
+	if not found then
+		serverHop()
+		break
+	end
+
 end
