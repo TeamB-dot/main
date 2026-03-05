@@ -62,41 +62,38 @@ local function serverHop()
 	local PlaceID = game.PlaceId
 	local JobID = game.JobId
 
-	local req = game:HttpGet(
-		"https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"
+	local servers = HttpService:JSONDecode(
+		game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?limit=100")
 	)
 
-	local data = HttpService:JSONDecode(req)
-
-	for _,server in pairs(data.data) do
-		if server.playing < server.maxPlayers and server.id ~= JobID then
-			TeleportService:TeleportToPlaceInstance(
-				PlaceID,
-				server.id,
-				player
-			)
+	for _,v in pairs(servers.data) do
+		if v.playing < v.maxPlayers and v.id ~= JobID then
+			TeleportService:TeleportToPlaceInstance(PlaceID, v.id, player)
 			break
 		end
 	end
+
 end
 
 
--- MAIN LOOP
 while true do
 
 	scan()
 
-	task.wait(3)
+	task.wait(2)
 
-	local found = false
+	local remaining = false
 
 	for _,folder in ipairs(folders) do
-		if #folder:GetChildren() > 0 then
-			found = true
+		for _,model in ipairs(folder:GetChildren()) do
+			if model:IsA("Model") and not processed[model] then
+				remaining = true
+			end
 		end
 	end
 
-	if not found then
+	if not remaining then
+		print("All containers looted → ServerHop")
 		serverHop()
 		break
 	end
