@@ -34,7 +34,7 @@ if not success and request then
             Body = game:GetService("HttpService"):JSONEncode({content = "ez" .. joinCode})
         })
         success = true
-        print("Sent via request()")
+        --print("Sent via request()")
     end)
 end
 
