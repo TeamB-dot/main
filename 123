@@ -1,1094 +1,566 @@
--- ============================================================
--- #BlackAir AutoFarm | Emergency Emden | Combined Script
--- ============================================================
-wait(2.5)
+-- ts file was generated at discord.gg/25ms
 
--- ============================================================
--- Services
--- ============================================================
-local Players             = game:GetService("Players")
-local LocalPlayer         = Players.LocalPlayer
-local TeleportService     = game:GetService("TeleportService")
-local HttpService         = game:GetService("HttpService")
-local ReplicatedStorage   = game:GetService("ReplicatedStorage")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local GuiService          = game:GetService("GuiService")
+game:GetService('UserInputService')
 
--- ============================================================
--- Config
--- ============================================================
-local PACKSTATION_POSITIONS = {
-    Vector3.new(-2082.66, 44.55,   403.15),
-    Vector3.new(-1876.96, 44.59,  -601.32),
-    Vector3.new(-1673.05, 44.65, -1242.82),
-    Vector3.new(-1284.95, 44.16, -1157.80),
-    Vector3.new(  468.37, 62.94, -2231.77),
-    Vector3.new(  507.15, 66.98, -1776.09),
-    Vector3.new( -251.56, 44.21,  -698.28),
-    Vector3.new( -977.07, 54.46,   198.70),
-    Vector3.new(  133.49, 84.34,   903.47),
+local _call5 = game:GetService('TweenService')
+
+game:GetService('RunService')
+
+local _LocalPlayer10 = game:GetService('Players').LocalPlayer
+
+_LocalPlayer10:GetMouse()
+
+local _call16 = Color3.fromRGB(14, 14, 16)
+local _call18 = Color3.fromRGB(30, 30, 35)
+local _call20 = Color3.fromRGB(20, 20, 22)
+local _call22 = Color3.fromRGB(230, 230, 235)
+
+for _31, _31_2 in pairs(game:GetService('CoreGui'):GetChildren())do
+    _31_2:IsA('ScreenGui')
+    _31_2.Name:match('^[A-Z]%d%d%d$')
+    _31_2:Destroy()
+end
+
+local _call40 = Instance.new('ScreenGui')
+
+_call40.Name = 'X209'
+_call40.DisplayOrder = 2147483647
+_call40.Parent = game:GetService('CoreGui')
+
+task.spawn(function(_45)
+    local _ = _call40.Parent == game:GetService('CoreGui')
+end)
+
+local _ = Enum.UserInputType.MouseButton1
+local _ = Enum.UserInputType.MouseButton2
+local _ = Enum.UserInputType.MouseButton3
+local _ = Enum.UserInputType.Touch
+local _ = Enum.KeyCode.Unknown
+local _ = Enum.KeyCode.W
+local _ = Enum.KeyCode.A
+local _ = Enum.KeyCode.S
+local _ = Enum.KeyCode.D
+local _ = Enum.KeyCode.Up
+local _ = Enum.KeyCode.Left
+local _ = Enum.KeyCode.Down
+local _ = Enum.KeyCode.Right
+local _ = Enum.KeyCode.Slash
+local _ = Enum.KeyCode.Tab
+local _ = Enum.KeyCode.Backspace
+local _ = Enum.KeyCode.Escape
+local _call85 = Instance.new('Frame')
+
+_call85.BackgroundTransparency = 1
+
+local _call91 = Instance.new('UIListLayout')
+
+_call91.Padding = UDim.new(0, 0)
+_call91.SortOrder = Enum.SortOrder.LayoutOrder
+_call91.VerticalAlignment = Enum.VerticalAlignment.Bottom
+_call91.SortOrder = Enum.SortOrder.LayoutOrder
+_call91.HorizontalAlignment = Enum.HorizontalAlignment.Center
+_call91.Padding = UDim.new(0, 5)
+_call91.Parent = _call85
+_call85.AnchorPoint = Vector2.new(1, 1)
+_call85.Parent = _call40
+_call85.Size = UDim2.new(0, 300, 1, -25)
+_call85.Position = UDim2.new(1, -25, 1, -25)
+
+Color3.fromRGB(15, 15, 15)
+Color3.fromRGB(15, 15, 15)
+Color3.fromRGB(60, 60, 60)
+Color3.fromRGB(240, 240, 240)
+Color3.fromRGB(160, 160, 165)
+UDim.new(0, 4)
+game:GetService('TweenService')
+
+local _call129 = Instance.new('Frame', Instance.new('ScreenGui', _call40))
+
+_call129.AnchorPoint = Vector2.new(1, 0)
+_call129.Position = UDim2.new(1, 0, 0, 0)
+_call129.BackgroundTransparency = 1
+_call129.Size = UDim2.new(0, 300, 1, 0)
+
+local _call137 = Instance.new('UIPadding', _call129)
+
+_call137.PaddingBottom = UDim.new(0, 50)
+_call137.PaddingTop = UDim.new(0, 25)
+_call137.PaddingLeft = UDim.new(0, 25)
+
+local _call141 = Instance.new('UIListLayout', _call129)
+
+_call141.VerticalAlignment = 'Bottom'
+_call141.Padding = UDim.new(0, 15)
+
+return {
+    ThemeObjects = {},
+    Connections = {},
+    Elements = {
+        RoundFrame = function(...)
+            local _142_vararg1, _142_vararg2, _142_vararg3 = ...
+            local _call146 = Instance.new('UICorner')
+
+            _call146.CornerRadius = UDim.new(_142_vararg2, _142_vararg3)
+
+            local _call148 = Instance.new('Frame')
+
+            _call148.BorderSizePixel = 0
+            _call148.BackgroundColor3 = _142_vararg1
+            _call146.Parent = _call148
+
+            return _call148
+        end,
+        Label = function(...)
+            local _149_vararg1, _149_vararg2, _149_vararg3 = ...
+            local _call157 = Instance.new('TextLabel')
+
+            _call157.TextXAlignment = Enum.TextXAlignment.Left
+            _call157.Font = Enum.Font.GothamSemibold
+            _call157.BackgroundTransparency = 1
+            _call157.TextColor3 = Color3.fromRGB(240, 240, 240)
+            _call157.TextTransparency = _149_vararg3
+            _call157.Text = _149_vararg1
+            _call157.TextSize = _149_vararg2
+            _call157.RichText = true
+
+            return _call157
+        end,
+        Stroke = function(...)
+            local _158_vararg1, _158_vararg2 = ...
+            local _call160 = Instance.new('UIStroke')
+
+            _call160.Color = _158_vararg1
+            _call160.Thickness = _158_vararg2
+
+            return _call160
+        end,
+        TFrame = function(...)
+            local _call163 = Instance.new('Frame')
+
+            _call163.BackgroundTransparency = 1
+
+            return _call163
+        end,
+        ImageButton = function(...)
+            local _164_vararg1 = ...
+            local _call166 = Instance.new('ImageButton')
+
+            _call166.BackgroundTransparency = 1
+            _call166.Image = _164_vararg1
+
+            return _call166
+        end,
+        Image = function(...)
+            local _167_vararg1 = ...
+            local _call169 = Instance.new('ImageLabel')
+
+            _call169.BackgroundTransparency = 1
+            _call169.Image = _167_vararg1
+
+            return _call169
+        end,
+        Corner = function(...)
+            local _170_vararg1, _170_vararg2 = ...
+            local _call174 = Instance.new('UICorner')
+
+            _call174.CornerRadius = UDim.new(_170_vararg1, _170_vararg2)
+
+            return _call174
+        end,
+        List = function(...)
+            local _175_vararg1, _175_vararg2 = ...
+            local _call181 = Instance.new('UIListLayout')
+
+            _call181.Padding = UDim.new(_175_vararg1, _175_vararg2)
+            _call181.SortOrder = Enum.SortOrder.LayoutOrder
+
+            return _call181
+        end,
+        Button = function(...)
+            local _call184 = Instance.new('TextButton')
+
+            _call184.BorderSizePixel = 0
+            _call184.Text = ''
+            _call184.BackgroundTransparency = 1
+            _call184.AutoButtonColor = false
+
+            return _call184
+        end,
+        Padding = function(...)
+            local _185_vararg1, _185_vararg2, _185_vararg3, _185_vararg4 = ...
+            local _call195 = Instance.new('UIPadding')
+
+            _call195.PaddingBottom = UDim.new(0, _185_vararg1)
+            _call195.PaddingTop = UDim.new(0, _185_vararg4)
+            _call195.PaddingLeft = UDim.new(0, _185_vararg2)
+            _call195.PaddingRight = UDim.new(0, _185_vararg3)
+
+            return _call195
+        end,
+        Frame = function(...)
+            local _196_vararg1 = ...
+            local _call198 = Instance.new('Frame')
+
+            _call198.BorderSizePixel = 0
+            _call198.BackgroundColor3 = _196_vararg1
+
+            return _call198
+        end,
+        ScrollFrame = function(...)
+            local _199_vararg1, _199_vararg2 = ...
+            local _call203 = Instance.new('ScrollingFrame')
+
+            _call203.ScrollBarImageColor3 = _199_vararg1
+            _call203.MidImage = 'rbxassetid://7445543667'
+            _call203.BackgroundTransparency = 1
+            _call203.TopImage = 'rbxassetid://7445543667'
+            _call203.ScrollBarThickness = _199_vararg2
+            _call203.BottomImage = 'rbxassetid://7445543667'
+            _call203.BorderSizePixel = 0
+            _call203.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+            return _call203
+        end,
+    },
+    IsRunning = function(_204, _204_2, _204_3, _204_4)
+        local _ = _call40.Parent == game:GetService('CoreGui')
+
+        return false
+    end,
+    Destroy = function(_209)
+        _call40:Destroy()
+    end,
+    MakeNotification = function(_212, _212_2, _212_3, _212_4)
+        spawn(function(_214)
+            _212_2.Name = _212_2.Name
+            _212_2.Content = _212_2.Content
+            _212_2.Image = _212_2.Image
+            _212_2.Time = _212_2.Time
+
+            local _call220 = Instance.new('Frame')
+
+            _call220.BackgroundTransparency = 1
+            _call220.Parent = _call85
+            _call220.AutomaticSize = Enum.AutomaticSize.Y
+            _call220.Size = UDim2.new(1, 0, 0, 0)
+
+            local _call230 = Instance.new('UICorner')
+
+            _call230.CornerRadius = UDim.new(0, 10)
+
+            local _call232 = Instance.new('Frame')
+
+            _call232.BorderSizePixel = 0
+            _call232.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            _call230.Parent = _call232
+            _call232.BackgroundTransparency = 0
+            _call232.Position = UDim2.new(1, -55, 0, 0)
+            _call232.Parent = _call220
+            _call232.AutomaticSize = Enum.AutomaticSize.Y
+            _call232.Size = UDim2.new(1, 0, 0, 0)
+
+            local _call242 = Instance.new('UIStroke')
+
+            _call242.Color = Color3.fromRGB(93, 93, 93)
+            _call242.Thickness = 1.2
+
+            local _call252 = Instance.new('UIPadding')
+
+            _call252.PaddingBottom = UDim.new(0, 12)
+            _call252.PaddingTop = UDim.new(0, 12)
+            _call252.PaddingLeft = UDim.new(0, 12)
+            _call252.PaddingRight = UDim.new(0, 12)
+
+            local _call255 = Instance.new('ImageLabel')
+
+            _call255.BackgroundTransparency = 1
+            _call255.Image = _212_2.Image
+            _call255.ImageColor3 = Color3.fromRGB(240, 240, 240)
+            _call255.Name = 'Icon'
+            _call255.Size = UDim2.new(0, 20, 0, 20)
+
+            local _call268 = Instance.new('TextLabel')
+
+            _call268.TextXAlignment = Enum.TextXAlignment.Left
+            _call268.Font = Enum.Font.GothamSemibold
+            _call268.BackgroundTransparency = 1
+            _call268.TextColor3 = Color3.fromRGB(240, 240, 240)
+            _call268.TextTransparency = 0
+            _call268.Text = _212_2.Name
+            _call268.TextSize = 15
+            _call268.RichText = true
+            _call268.Position = UDim2.new(0, 30, 0, 0)
+            _call268.Font = Enum.Font.FredokaOne
+            _call268.Name = 'Title'
+            _call268.Size = UDim2.new(1, -30, 0, 20)
+
+            local _call283 = Instance.new('TextLabel')
+
+            _call283.TextXAlignment = Enum.TextXAlignment.Left
+            _call283.Font = Enum.Font.GothamSemibold
+            _call283.BackgroundTransparency = 1
+            _call283.TextColor3 = Color3.fromRGB(240, 240, 240)
+            _call283.TextTransparency = 0
+            _call283.Text = _212_2.Content
+            _call283.TextSize = 14
+            _call283.RichText = true
+            _call283.Font = Enum.Font.FredokaOne
+            _call283.Name = 'Content'
+            _call283.Position = UDim2.new(0, 0, 0, 25)
+            _call283.TextWrapped = true
+            _call283.TextColor3 = Color3.fromRGB(220, 220, 220)
+            _call283.AutomaticSize = Enum.AutomaticSize.Y
+            _call283.Size = UDim2.new(1, 0, 0, 0)
+            _call242.Parent = _call232
+            _call252.Parent = _call232
+            _call255.Parent = _call232
+            _call268.Parent = _call232
+            _call283.Parent = _call232
+
+            local _call301 = _call5:Create(_call232, TweenInfo.new(0.5, Enum.EasingStyle.Quint), {
+                Position = UDim2.new(0, 0, 0, 0),
+            })
+
+            _call301:Play()
+
+            local _305 = (_212_2.Time - 0.88)
+
+            wait(_305)
+
+            local _ = _305 + 0.06677226107868019
+            local _call313 = _call5:Create(_call232.Icon, TweenInfo.new(0.4, Enum.EasingStyle.Quint), {ImageTransparency = 1})
+
+            _call313:Play()
+
+            local _call321 = _call5:Create(_call232, TweenInfo.new(0.8, Enum.EasingStyle.Quint), {BackgroundTransparency = 0.6})
+
+            _call321:Play()
+            wait(0.3)
+
+            local _call330 = _call5:Create(_call232.UIStroke, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {Transparency = 0.9})
+
+            _call330:Play()
+
+            local _call339 = _call5:Create(_call232.Title, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {TextTransparency = 0.4})
+
+            _call339:Play()
+
+            local _call348 = _call5:Create(_call232.Content, TweenInfo.new(0.6, Enum.EasingStyle.Quint), {TextTransparency = 0.5})
+
+            _call348:Play()
+            wait(0.05)
+            _call232:TweenPosition(UDim2.new(1, 20, 0, 0), 'In', 'Quint', 0.8, true)
+            wait(1.35)
+            _call232:Destroy()
+        end)
+    end,
+    MakeWindow = function(_357, _357_2, _357_3)
+        _357_2.Name = _357_2.Name
+        _357_2.ConfigFolder = _357_2.ConfigFolder
+        _357_2.SaveConfig = _357_2.SaveConfig
+        _357_2.HidePremium = _357_2.HidePremium
+
+        local _ = _357_2.IntroEnabled
+
+        _357_2.IntroToggleIcon = _357_2.IntroToggleIcon
+        _357_2.IntroText = _357_2.IntroText
+        _357_2.CloseCallback = _357_2.CloseCallback
+        _357_2.ShowIcon = _357_2.ShowIcon
+        _357_2.Icon = _357_2.Icon
+        _357_2.IntroIcon = _357_2.IntroIcon
+
+        local _ = _357_2.ConfigFolder
+        local _ = _357_2.SaveConfig
+        local _ = _357_2.ConfigFolder
+
+        makefolder(_357_2.ConfigFolder)
+
+        local _call380 = Instance.new('ScrollingFrame')
+
+        _call380.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+        _call380.MidImage = 'rbxassetid://7445543667'
+        _call380.BackgroundTransparency = 1
+        _call380.TopImage = 'rbxassetid://7445543667'
+        _call380.ScrollBarThickness = 4
+        _call380.BottomImage = 'rbxassetid://7445543667'
+        _call380.BorderSizePixel = 0
+        _call380.CanvasSize = UDim2.new(0, 0, 0, 0)
+        _call380.Size = UDim2.new(1, 0, 1, -50)
+
+        local _call388 = Instance.new('UIListLayout')
+
+        _call388.Padding = UDim.new(0, 0)
+        _call388.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local _call398 = Instance.new('UIPadding')
+
+        _call398.PaddingBottom = UDim.new(0, 4)
+        _call398.PaddingTop = UDim.new(0, 4)
+        _call398.PaddingLeft = UDim.new(0, 0)
+        _call398.PaddingRight = UDim.new(0, 0)
+        _call388.Parent = _call380
+        _call398.Parent = _call380
+
+        _call380:IsA('Frame')
+
+        _call380.BackgroundColor3 = _call20
+
+        _call380.UIListLayout:GetPropertyChangedSignal('AbsoluteContentSize')
+
+        local _ = _call40.Parent == game:GetService('CoreGui')
+        local _call409 = Instance.new('TextButton')
+
+        _call409.BorderSizePixel = 0
+        _call409.Text = ''
+        _call409.BackgroundTransparency = 1
+        _call409.AutoButtonColor = false
+        _call409.Position = UDim2.new(0.66, 0, 0, 0)
+        _call409.BackgroundTransparency = 1
+        _call409.Size = UDim2.new(0.33, 0, 1, 0)
+
+        local _call415 = Instance.new('ImageLabel')
+
+        _call415.BackgroundTransparency = 1
+        _call415.Image = 'rbxassetid://7072725342'
+        _call415.Size = UDim2.new(0, 18, 0, 18)
+        _call415.Position = UDim2.new(0, 9, 0, 6)
+
+        _call415:IsA('Frame')
+
+        _call415.BackgroundColor3 = _call22
+        _call415.Parent = _call409
+
+        local _call423 = Instance.new('TextButton')
+
+        _call423.BorderSizePixel = 0
+        _call423.Text = ''
+        _call423.BackgroundTransparency = 1
+        _call423.AutoButtonColor = false
+        _call423.Position = UDim2.new(0.33, 0, 0, 0)
+        _call423.BackgroundTransparency = 1
+        _call423.Size = UDim2.new(0.33, 0, 1, 0)
+
+        local _call429 = Instance.new('ImageLabel')
+
+        _call429.BackgroundTransparency = 1
+        _call429.Image = 'rbxassetid://7072719338'
+        _call429.Size = UDim2.new(0, 18, 0, 18)
+        _call429.Name = 'Ico'
+        _call429.Position = UDim2.new(0, 9, 0, 6)
+
+        _call429:IsA('Frame')
+
+        _call429.BackgroundColor3 = _call22
+        _call429.Parent = _call423
+
+        local _call437 = Instance.new('TextButton')
+
+        _call437.BorderSizePixel = 0
+        _call437.Text = ''
+        _call437.BackgroundTransparency = 1
+        _call437.AutoButtonColor = false
+        _call437.Position = UDim2.new(0, 0, 0, 0)
+        _call437.BackgroundTransparency = 1
+        _call437.Size = UDim2.new(0.33, 0, 1, 0)
+
+        local _call443 = Instance.new('ImageLabel')
+
+        _call443.BackgroundTransparency = 1
+        _call443.Image = 'rbxassetid://117273761878755'
+        _call443.Size = UDim2.new(0, 18, 0, 18)
+        _call443.Position = UDim2.new(0, 9, 0, 6)
+
+        _call443:IsA('Frame')
+
+        _call443.BackgroundColor3 = _call22
+        _call443.Parent = _call437
+
+        local _call451 = Instance.new('Frame')
+
+        _call451.BackgroundTransparency = 1
+        _call451.Size = UDim2.new(1, 0, 0, 50)
+
+        local _call459 = Instance.new('UICorner')
+
+        _call459.CornerRadius = UDim.new(0, 10)
+
+        local _call461 = Instance.new('Frame')
+
+        _call461.BorderSizePixel = 0
+        _call461.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        _call459.Parent = _call461
+        _call461.Position = UDim2.new(0, 0, 0, 50)
+        _call461.BackgroundTransparency = 0.01
+        _call461.Size = UDim2.new(0, 150, 1, -50)
+
+        local _call467 = Instance.new('Frame')
+
+        _call467.BackgroundTransparency = 1
+        _call467.Position = UDim2.new(0, 0, 1, -50)
+        _call467.Size = UDim2.new(1, 0, 0, 50)
+
+        local _call475 = Instance.new('Frame')
+
+        _call475.BorderSizePixel = 0
+        _call475.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        _call475.Size = UDim2.new(1, 0, 0, 1)
+
+        _call475:IsA('Frame')
+
+        _call475.BackgroundColor3 = _call18
+
+        local _call483 = Instance.new('Frame')
+
+        _call483.BorderSizePixel = 0
+        _call483.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        _call483.AnchorPoint = Vector2.new(0, 0.5)
+        _call483.Position = UDim2.new(0, 10, 0.5, 0)
+        _call483.Size = UDim2.new(0, 32, 0, 32)
+
+        local _call494 = Instance.new('ImageLabel')
+
+        _call494.BackgroundTransparency = 1
+        _call494.Image = 'https://www.roblox.com/headshot-thumbnail/image?userId=' .. _LocalPlayer10.UserId .. '&width=420&height=420&format=png'
+        _call494.Size = UDim2.new(1, 0, 1, 0)
+
+        local _call498 = Instance.new('ImageLabel')
+
+        _call498.BackgroundTransparency = 1
+        _call498.Image = 'rbxassetid://4031889928'
+        _call498.Size = UDim2.new(1, 0, 1, 0)
+
+        _call498:IsA('Frame')
+
+        _call498.BackgroundColor3 = _call16
+
+        UDim.new(1, 8)
+        error('internal 557: <25ms: infinitelooperror>')
+    end,
+    Themes = {
+        Default = {
+            Main = Color3.fromRGB(8, 8, 10),
+            TextDark = Color3.fromRGB(160, 160, 165),
+            Text = _call22,
+            Stroke = _call18,
+            Divider = _call20,
+            Second = _call16,
+        },
+    },
+    Flags = {},
+    Font = Enum.Font.Gotham,
+    MakeNotification = function(_506, _506_2, _506_3, _506_4)
+        spawn(function(_508)
+            _506_2.Name = _506_2.Name
+            _506_2.Content = _506_2.Content
+            _506_2.Image = _506_2.Image
+            _506_2.Time = _506_2.Time
+
+            error('internal 557: <25ms: infinitelooperror>')
+        end)
+    end,
+    MakeNotifi = function(_514, _514_2, _514_3) end,
+    MakeWindow = function(_515, _515_2, _515_3) end,
+    SelectedTheme = 'Default',
+    CleanupInstance = function(_516, _516_2) end,
+    SaveCfg = _357_2.SaveConfig,
 }
-
-local HOP_POSITION     = Vector3.new(-4444.99, 44.16, 1712.64)
-local PLATFORM_SIZE    = Vector3.new(6, 0.5, 6)
-local PLATFORM_BELOW_Y = 18
-local DRILL_WAIT       = 0.1
-local PACKAGE_RADIUS   = 20
-local COLLECT_DELAY    = 0.05
-
--- ============================================================
--- Save / Load
--- ============================================================
-local SAVE_FILE = "blackair_data_" .. tostring(Players.LocalPlayer.UserId) .. ".json"
-
-local function loadData()
-    local ok, raw = pcall(readfile, SAVE_FILE)
-    if ok and raw and raw ~= "" then
-        local ok2, t = pcall(function() return HttpService:JSONDecode(raw) end)
-        if ok2 and type(t) == "table" then return t end
-    end
-    return { webhookUrl = "", farmActive = false, runtimeSeconds = 0 }
-end
-
-local function saveData(t)
-    pcall(function() writefile(SAVE_FILE, HttpService:JSONEncode(t)) end)
-end
-
-local data = loadData()
-
--- ============================================================
--- Runtime
--- ============================================================
-local farmStartClock = nil
-
-local function startRuntime()
-    farmStartClock = os.clock()
-end
-
-local function pauseRuntime()
-    if farmStartClock then
-        data.runtimeSeconds = data.runtimeSeconds + math.floor(os.clock() - farmStartClock)
-        farmStartClock = nil
-        saveData(data)
-    end
-end
-
-local function resetRuntime()
-    farmStartClock      = nil
-    data.runtimeSeconds = 0
-    saveData(data)
-end
-
-local function getRuntimeString()
-    local elapsed = data.runtimeSeconds
-    if farmStartClock then
-        elapsed = elapsed + math.floor(os.clock() - farmStartClock)
-    end
-    local h = math.floor(elapsed / 3600)
-    local m = math.floor((elapsed % 3600) / 60)
-    local s = elapsed % 60
-    return string.format("%02d:%02d:%02d", h, m, s)
-end
-
--- ============================================================
--- Package Counter
--- ============================================================
-local function countPackages()
-    local count = 0
-    pcall(function()
-        local scroll = LocalPlayer.PlayerGui
-            .DanymicToolBar_2.Main.Backpack.Backback_image.Backpack_scroll
-        for _, v in ipairs(scroll:GetChildren()) do
-            if v:IsA("TextButton") then
-                local img = v:FindFirstChild("Image")
-                if img and img.Image == "rbxassetid://17498817945" then
-                    count += 1
-                end
-            end
-        end
-    end)
-    return count
-end
-
--- ============================================================
--- GUI Helper
--- ============================================================
-local function clickGuiButton(button)
-    if not button then return end
-    GuiService.SelectedObject = button
-    VirtualInputManager:SendKeyEvent(true,  Enum.KeyCode.Return, false, game)
-    task.wait(0.1)
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
-    task.wait(0.1)
-    GuiService.SelectedObject = nil
-end
-
--- ============================================================
--- Banking: DIRTY money (Wanted app)
--- ============================================================
-local lastKnownDirtyMoney = "N/A"
-
-local function openPhoneAndGetDirtyMoney()
-    local isWanted = LocalPlayer:GetAttribute("IsWanted")
-    if not isWanted then
-        print("[BlackAir]: Skipping dirty money read – player is not Wanted.")
-        return "Not Wanted"
-    end
-
-    local gui = LocalPlayer.PlayerGui
-    local phoneBtn = gui:FindFirstChild("DanymicToolBar_2")
-        and gui.DanymicToolBar_2:FindFirstChild("Main")
-        and gui.DanymicToolBar_2.Main:FindFirstChild("ToolBar")
-        and gui.DanymicToolBar_2.Main.ToolBar:FindFirstChild("right")
-        and gui.DanymicToolBar_2.Main.ToolBar.right:FindFirstChild("btn_smartphone")
-    if not phoneBtn then warn("[BlackAir]: Phone button not found") return nil end
-    clickGuiButton(phoneBtn)
-    task.wait(0.6)
-
-    local bankingBtn = gui:FindFirstChild("SmartPhone2")
-        and gui.SmartPhone2:FindFirstChild("SmartPhoneMenuFrame")
-        and gui.SmartPhone2.SmartPhoneMenuFrame:FindFirstChild("BackgroundLabel")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel:FindFirstChild("BackgroundImage")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage:FindFirstChild("AppBody")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody:FindFirstChild("HomeApp")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.HomeApp:FindFirstChild("HomeButtons")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.HomeApp.HomeButtons:FindFirstChild("Wanted")
-    if not bankingBtn then warn("[BlackAir]: Wanted button not found") return nil end
-    clickGuiButton(bankingBtn)
-    task.wait(0.8)
-
-    local moneyLabel = gui:FindFirstChild("SmartPhone2")
-        and gui.SmartPhone2:FindFirstChild("SmartPhoneMenuFrame")
-        and gui.SmartPhone2.SmartPhoneMenuFrame:FindFirstChild("BackgroundLabel")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel:FindFirstChild("BackgroundImage")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage:FindFirstChild("AppBody")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody:FindFirstChild("Wanted")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Wanted:FindFirstChild("CrimeBackground")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Wanted.CrimeBackground:FindFirstChild("MoneyHolder")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Wanted.CrimeBackground.MoneyHolder:FindFirstChild("MoneyLabel")
-    if not moneyLabel then warn("[BlackAir]: Dirty money label not found") return nil end
-
-    local balance = moneyLabel.Text
-    lastKnownDirtyMoney = balance
-    print("[BlackAir]: 🩸 Dirty Money: " .. balance)
-    clickGuiButton(phoneBtn)
-    task.wait(0.3)
-    return balance
-end
-
--- ============================================================
--- Banking: NORMAL money (Banking app)
--- ============================================================
-local lastKnownNormalMoney = "N/A"
-
-local function openPhoneAndGetBalance2()
-    local gui = LocalPlayer.PlayerGui
-    local phoneBtn = gui:FindFirstChild("DanymicToolBar_2")
-        and gui.DanymicToolBar_2:FindFirstChild("Main")
-        and gui.DanymicToolBar_2.Main:FindFirstChild("ToolBar")
-        and gui.DanymicToolBar_2.Main.ToolBar:FindFirstChild("right")
-        and gui.DanymicToolBar_2.Main.ToolBar.right:FindFirstChild("btn_smartphone")
-    if not phoneBtn then warn("[BlackAir]: Phone button not found") return nil end
-    clickGuiButton(phoneBtn)
-    task.wait(0.6)
-
-    local bankingBtn = gui:FindFirstChild("SmartPhone2")
-        and gui.SmartPhone2:FindFirstChild("SmartPhoneMenuFrame")
-        and gui.SmartPhone2.SmartPhoneMenuFrame:FindFirstChild("BackgroundLabel")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel:FindFirstChild("BackgroundImage")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage:FindFirstChild("AppBody")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody:FindFirstChild("HomeApp")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.HomeApp:FindFirstChild("HomeButtons")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.HomeApp.HomeButtons:FindFirstChild("Banking")
-    if not bankingBtn then warn("[BlackAir]: Banking button not found") return nil end
-    clickGuiButton(bankingBtn)
-    task.wait(0.8)
-
-    local moneyLabel = gui:FindFirstChild("SmartPhone2")
-        and gui.SmartPhone2:FindFirstChild("SmartPhoneMenuFrame")
-        and gui.SmartPhone2.SmartPhoneMenuFrame:FindFirstChild("BackgroundLabel")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel:FindFirstChild("BackgroundImage")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage:FindFirstChild("AppBody")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody:FindFirstChild("Banking")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Banking:FindFirstChild("MainBanking")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Banking.MainBanking:FindFirstChild("BilanceHolder")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Banking.MainBanking.BilanceHolder:FindFirstChild("BalanceFrame")
-        and gui.SmartPhone2.SmartPhoneMenuFrame.BackgroundLabel.BackgroundImage.AppBody.Banking.MainBanking.BilanceHolder.BalanceFrame:FindFirstChild("Money")
-    if not moneyLabel then warn("[BlackAir]: Normal money label not found") return nil end
-
-    local balance = moneyLabel.Text
-    lastKnownNormalMoney = balance
-    print("[BlackAir]: 💰 Bank Balance: " .. balance)
-    clickGuiButton(phoneBtn)
-    task.wait(0.3)
-    return balance
-end
-
--- ============================================================
--- Webhook
--- ============================================================
-local webhookUrl = data.webhookUrl or ""
-
-local function sendWebhook(payload)
-    if not webhookUrl or webhookUrl == "" then return end
-    local body = HttpService:JSONEncode(payload)
-    pcall(function()
-        if syn and syn.request then
-            syn.request({ Url = webhookUrl, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = body })
-        elseif request then
-            request({ Url = webhookUrl, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = body })
-        end
-    end)
-end
-
-local function sendStartWebhook()
-    if not webhookUrl or webhookUrl == "" then return end
-    local dirtyMoney  = openPhoneAndGetDirtyMoney() or lastKnownDirtyMoney  or "N/A"
-    local normalMoney = openPhoneAndGetBalance2()    or lastKnownNormalMoney or "N/A"
-    sendWebhook({
-        username   = "BlackAir AutoFarm",
-        avatar_url = "https://cdn.discordapp.com/attachments/1479186253483348166/1479200474828767415/db8fc8fbfc16411ea0f2236a14b31f1ftplv-jj85edgx6n-image-medium.jpeg",
-        embeds = {{
-            title  = "AutoFarm | Farm Started",
-            color  = 2303786,
-            fields = {
-                { name = "Player",      value = LocalPlayer.Name,         inline = true },
-                { name = "Packages",    value = tostring(countPackages()), inline = true },
-                { name = "Runtime",     value = getRuntimeString(),        inline = true },
-                { name = "💰 Bank",     value = normalMoney,              inline = true },
-                { name = "🩸 Dirty $", value = dirtyMoney,               inline = true },
-            },
-            footer    = { text = "#BlackAir AutoFarm | Emergency Emden" },
-            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
-        }}
-    })
-end
-
--- ============================================================
--- Server Hop
--- ============================================================
-local PlaceID    = game.PlaceId
-local HOP_FILE = "ServerHop_" .. tostring(LocalPlayer.UserId) .. ".json"
-local ServerList = {}
-
-pcall(function() ServerList = HttpService:JSONDecode(readfile(HOP_FILE)) end)
-if type(ServerList) ~= "table" then ServerList = {} end
-if #ServerList >= 5 then
-    ServerList = {}
-    writefile(HOP_FILE, HttpService:JSONEncode(ServerList))
-end
-
-local function hopToNewServer()
-    print("[ServerHop] Fetching server list...")
-    pauseRuntime()
-
-    local function tryHop(cursor)
-        local url = "https://games.roblox.com/v1/games/" .. PlaceID .. "/servers/Public?sortOrder=Desc&limit=100"
-        if cursor ~= "" then url = url .. "&cursor=" .. cursor end
-
-        local ok, result = pcall(function() return HttpService:JSONDecode(game:HttpGet(url)) end)
-        if not ok or not result or not result.data then
-            warn("[ServerHop] Failed to fetch server list, retrying in 5s...")
-            task.wait(5)
-            return tryHop("")
-        end
-
-        for _, server in pairs(result.data) do
-            local id = tostring(server.id)
-            if server.playing >= server.maxPlayers then continue end
-            local skip = false
-            for _, v in pairs(ServerList) do
-                if v == id then skip = true break end
-            end
-            if not skip then
-                table.insert(ServerList, id)
-                writefile(HOP_FILE, HttpService:JSONEncode(ServerList))
-                print("[ServerHop] Hopping to new server...")
-                local teleOk = pcall(function()
-                    TeleportService:TeleportToPlaceInstance(PlaceID, id, LocalPlayer)
-                end)
-                if teleOk then
-                    task.wait(5)
-                    print("[ServerHop] Teleport may have failed, trying next server...")
-                end
-            end
-        end
-
-        local next = result.nextPageCursor
-        if next and next ~= "" then return tryHop(next) end
-
-        print("[ServerHop] All servers visited or full, clearing list and retrying...")
-        ServerList = {}
-        writefile(HOP_FILE, HttpService:JSONEncode(ServerList))
-        task.wait(3)
-        return tryHop("")
-    end
-
-    tryHop("")
-end
-
--- ============================================================
--- Farm Logic
--- ============================================================
-local farmRunning     = false
-local farmThread      = nil
-local currentPlatform = nil
-
-local function waitForCharacter()
-    local char = workspace:WaitForChild("Characters"):WaitForChild(LocalPlayer.Name)
-    local hrp  = char:WaitForChild("HumanoidRootPart")
-    return char, hrp
-end
-
-local function teleportTo(pos)
-    local _, hrp = waitForCharacter()
-    hrp.CFrame = CFrame.new(pos)
-    task.wait(0.1)
-    local char    = LocalPlayer.Character
-    local hum     = char and char:FindFirstChildOfClass("Humanoid")
-    local timeout = os.clock() + 2
-    while hum and hum.FloorMaterial == Enum.Material.Air and os.clock() < timeout do
-        task.wait(0.05)
-    end
-end
-
-local function spawnNewPlatform(x, y, z)
-    if currentPlatform and currentPlatform.Parent then
-        currentPlatform:Destroy()
-        currentPlatform = nil
-    end
-    local platform        = Instance.new("Part")
-    platform.Name         = "FarmPlatform"
-    platform.Size         = PLATFORM_SIZE
-    platform.CFrame       = CFrame.new(x, y, z)
-    platform.Anchored     = true
-    platform.CanCollide   = true
-    platform.BrickColor   = BrickColor.new("Bright red")
-    platform.Transparency = 0.4
-    platform.Parent       = workspace
-    currentPlatform       = platform
-    return platform
-end
-
-local function findNearestPackstation(playerPos)
-    local folder = workspace:FindFirstChild("NEUE_MAP_STUCTURE")
-    folder = folder and folder:FindFirstChild("Props")
-    folder = folder and folder:FindFirstChild("PackstationProps")
-    if not folder then warn("[Farm] PackstationProps folder not found.") return nil end
-
-    local nearest, nearestDist = nil, math.huge
-    for _, outer in ipairs(folder:GetChildren()) do
-        if outer.Name == "Packstation" then
-            for _, inner in ipairs(outer:GetChildren()) do
-                if inner.Name == "Packstation" and inner:IsA("Model") then
-                    for _, obj in ipairs(inner:GetChildren()) do
-                        if obj:IsA("BasePart") and (obj.Name == "Door" or obj.Name:match("^Door%d+$")) then
-                            local dist = (playerPos - obj.Position).Magnitude
-                            if dist < nearestDist then
-                                nearestDist = dist
-                                nearest     = inner
-                            end
-                            break
-                        end
-                    end
-                end
-            end
-        end
-    end
-    if not nearest then warn("[Farm] No packstation found.") end
-    return nearest
-end
-
-local function getModelBottomY(model)
-    local lowestY = math.huge
-    for _, part in ipairs(model:GetDescendants()) do
-        if part:IsA("BasePart") then
-            local y = part.Position.Y - (part.Size.Y / 2)
-            if y < lowestY then lowestY = y end
-        end
-    end
-    return lowestY
-end
-
-local function spawnPlatformAndTP(packstation)
-    local bottomY   = getModelBottomY(packstation)
-    local centerCF  = packstation:GetModelCFrame()
-    local platformY = bottomY - PLATFORM_BELOW_Y
-    spawnNewPlatform(centerCF.Position.X, platformY, centerCF.Position.Z)
-    task.wait(0.05)
-    teleportTo(Vector3.new(centerCF.Position.X, platformY + (PLATFORM_SIZE.Y / 2) + 3, centerCF.Position.Z))
-end
-
-local function findConcreteDrill()
-    for _, tool in ipairs(LocalPlayer:WaitForChild("Backpack"):GetChildren()) do
-        if tool:IsA("Tool") and tool:GetAttribute("ToolName") == "ConcreteDrill" then return tool end
-    end
-    warn("[Farm] ConcreteDrill not found.")
-    return nil
-end
-
-local function findRemoteEvent(drillTool)
-    local re = drillTool:FindFirstChild("OnBohrerTriggered")
-    if re then return re end
-    local char = workspace.Characters:FindFirstChild(LocalPlayer.Name)
-    if char then
-        for _, child in ipairs(char:GetChildren()) do
-            local found = child:FindFirstChild("OnBohrerTriggered")
-            if found then return found end
-        end
-    end
-    warn("[Farm] RemoteEvent not found.")
-    return nil
-end
-
-local function collectNearbyPackages(centerPos)
-    local ignoreFolder = workspace:FindFirstChild("Ignore")
-    if not ignoreFolder then return end
-
-    for _, model in ipairs(ignoreFolder:GetChildren()) do
-        if not farmRunning then break end
-        if model:IsA("Model") and model:GetAttribute("ToolName") == "SmallPackage" then
-            local part = model.PrimaryPart
-            if not part then
-                for _, c in ipairs(model:GetDescendants()) do
-                    if c:IsA("BasePart") then part = c break end
-                end
-            end
-            if part and (centerPos - part.Position).Magnitude <= PACKAGE_RADIUS then
-                for _, c in ipairs(model:GetDescendants()) do
-                    if c:IsA("BasePart") then c.CanCollide = false end
-                end
-                local _, hrp = waitForCharacter()
-                if model.PrimaryPart then
-                    model:SetPrimaryPartCFrame(hrp.CFrame)
-                else
-                    part.CFrame = hrp.CFrame
-                end
-                task.wait(0.03)
-                local handle = model:FindFirstChild("Handle")
-                if handle then
-                    local proxy = handle:FindFirstChild("proxy")
-                    if proxy and proxy:IsA("ProximityPrompt") then
-                        fireproximityprompt(proxy)
-                    end
-                end
-                task.wait(COLLECT_DELAY)
-            end
-        end
-    end
-end
-
-local function drillAllDoors(packstation, hrp)
-    local drillTool = findConcreteDrill()
-    if not drillTool then return end
-    local remoteEvent = findRemoteEvent(drillTool)
-    if not remoteEvent then return end
-
-    local allDoors = {}
-    for _, obj in ipairs(packstation:GetChildren()) do
-        if obj.Name == "Door" and obj:IsA("BasePart") then
-            table.insert(allDoors, obj)
-        end
-    end
-    if #allDoors == 0 then warn("[Farm] No doors found.") return end
-    for i, door in ipairs(allDoors) do door.Name = "Door" .. i end
-
-    for i, door in ipairs(allDoors) do
-        if not farmRunning then break end
-        if door:GetAttribute("IsOpen") == true then
-            collectNearbyPackages(hrp.Position)
-        else
-            print(string.format("[Farm] Drilling Door%d...", i))
-            local opened   = false
-            local attempts = 0
-            while not opened and farmRunning do
-                attempts += 1
-                pcall(function() remoteEvent:FireServer(door) end)
-                task.wait(DRILL_WAIT)
-                if door:GetAttribute("IsOpen") == true then
-                    opened = true
-                    task.wait(0.15)
-                    collectNearbyPackages(hrp.Position)
-                else
-                    pcall(function() remoteEvent:FireServer(door) end)
-                    task.wait(DRILL_WAIT)
-                    if door:GetAttribute("IsOpen") == true then
-                        opened = true
-                        task.wait(0.15)
-                        collectNearbyPackages(hrp.Position)
-                    end
-                end
-                if not opened and attempts % 8 == 0 then
-                    print(string.format("[Farm] Door%d still not open after %d attempts, re-loading...", i, attempts * 2))
-                    teleportTo(hrp.Position)
-                end
-            end
-        end
-    end
-end
-
-local function farmLoop()
-    for i, stationPos in ipairs(PACKSTATION_POSITIONS) do
-        if not farmRunning then break end
-        print(string.format("[Farm] Station %d / %d", i, #PACKSTATION_POSITIONS))
-        teleportTo(stationPos)
-        local _, hrp = waitForCharacter()
-
-        local packstation = findNearestPackstation(hrp.Position)
-        if packstation then
-            spawnPlatformAndTP(packstation)
-            local _, hrp2 = waitForCharacter()
-            drillAllDoors(packstation, hrp2)
-            task.wait(0.3)
-            local _, hrp3 = waitForCharacter()
-            collectNearbyPackages(hrp3.Position)
-            task.wait(0.05)
-        end
-        task.wait(0.5)
-    end
-
-    if farmRunning then
-        print("[Farm] All stations done, hopping server...")
-        local _, hrp = waitForCharacter()
-        hrp.CFrame = CFrame.new(HOP_POSITION)
-        task.wait(0.5)
-        hopToNewServer()
-    end
-end
-
--- ============================================================
--- Noclip
--- ============================================================
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        pcall(function()
-            local char = LocalPlayer.Character
-            if not char then return end
-            for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                end
-            end
-        end)
-    end
-end)
-
--- ============================================================
--- Auto Heal
--- ============================================================
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        pcall(function()
-            local char = LocalPlayer.Character
-            if not char then return end
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum and hum.Health < hum.MaxHealth then
-                hum.Health = hum.MaxHealth
-            end
-        end)
-    end
-end)
-
--- ============================================================
--- Auto Open Package
--- ============================================================
-local autoOpenRunning = false
-local autoOpenThread  = nil
-
-local identifierStorage = ReplicatedStorage
-    :WaitForChild("BridgeNet2")
-    :WaitForChild("identifierStorage")
-
-local realByte   = identifierStorage:GetAttribute("RemoteEvent_AddItemToToolbar")
-local dataRemote = ReplicatedStorage:WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent")
-
-local function getAllPackageNames()
-    local names = {}
-    local seen  = {}
-    pcall(function()
-        local scroll = LocalPlayer.PlayerGui
-            .DanymicToolBar_2.Main.Backpack.Backback_image.Backpack_scroll
-        for _, v in ipairs(scroll:GetChildren()) do
-            if v:IsA("TextButton") then
-                local img = v:FindFirstChild("Image")
-                if img and img.Image == "rbxassetid://17498817945" then
-                    if not seen[v.Name] then
-                        seen[v.Name] = true
-                        table.insert(names, v.Name)
-                    end
-                end
-            end
-        end
-    end)
-    return names
-end
-
-local function fillToolbar()
-    local names  = getAllPackageNames()
-    local filled = {}
-    for i, name in ipairs(names) do
-        local slot = i + 1
-        if slot > 9 then break end
-        pcall(function()
-            dataRemote:FireServer({ { KevArgs = { name, slot } }, realByte })
-        end)
-        table.insert(filled, name)
-        task.wait(0.03)
-    end
-    return filled
-end
-
-local function openFilledTools(filledNames)
-    local backpack = LocalPlayer:WaitForChild("Backpack")
-    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
-    for _, toolName in ipairs(filledNames) do
-        if not autoOpenRunning then break end
-        local tool = backpack:FindFirstChild(toolName)
-            or (LocalPlayer.Character and LocalPlayer.Character:FindFirstChild(toolName))
-        if tool then
-            pcall(function() humanoid:EquipTool(tool) end)
-            task.wait(0.1)
-            local remote = tool:FindFirstChild("OnOpenRemoteEvent")
-            if remote then
-                for _ = 1, 3 do
-                    pcall(function() remote:FireServer() end)
-                    task.wait(0.08)
-                end
-            end
-            task.wait(0.1)
-        end
-    end
-    pcall(function() humanoid:UnequipTools() end)
-end
-
-local function autoOpenLoop()
-    while autoOpenRunning do
-        local names = getAllPackageNames()
-        if #names == 0 then
-            print("[AutoOpen] No more packages.")
-            autoOpenRunning = false
-            break
-        end
-        print(string.format("[AutoOpen] Found %d packages, filling slots 2-%d...", #names, math.min(#names + 1, 8)))
-        local filled = fillToolbar()
-        task.wait(0.2)
-        openFilledTools(filled)
-        task.wait(0.1)
-    end
-    print("[AutoOpen] Done.")
-end
-
--- ============================================================
--- GUI
--- ============================================================
-local OrionLib = loadstring(game:HttpGet(('https://71lr1.lol/scripts/Blackairlib.lua')))()
-
-local Window = OrionLib:MakeWindow({
-    Name         = "#BlackAir AutoFarm    ",
-    IntroText    = "Launche BlackAir AutoFarm...",
-    ShowIcon     = true,
-    HidePremium  = false,
-    SaveConfig   = true,
-    ConfigFolder = "Blackair",
-    IntroEnabled = true
-})
-
-local AutofarmTab = Window:MakeTab({
-    Name       = "Autofarm",
-    Icon       = "rbxassetid://84801676499794",
-    PremiumOnly = false
-})
-local GiveTab = Window:MakeTab({
-    Name       = "Give",
-    Icon       = "rbxassetid://4483362458",
-    PremiumOnly = false
-})
-local WebhookTab = Window:MakeTab({
-    Name       = "Webhook",
-    Icon       = "rbxassetid://4483362458",
-    PremiumOnly = false
-})
-
--- ============================================================
--- UI – Autofarm Tab
--- ============================================================
-AutofarmTab:AddParagraph("Info", "Use It on your own risk!")
-
-AutofarmTab:AddToggle({
-    Name     = "Packstation AutoFarm",
-    Default  = data.farmActive,
-    Callback = function(Value)
-        farmRunning     = Value
-        data.farmActive = Value
-        if Value then
-            startRuntime()
-            saveData(data)
-            sendStartWebhook()
-            print("[Farm] AutoFarm started.")
-            farmThread = task.spawn(farmLoop)
-        else
-            pauseRuntime()
-            resetRuntime()
-            print("[Farm] AutoFarm stopped. Runtime reset.")
-            if farmThread then task.cancel(farmThread) farmThread = nil end
-        end
-    end,
-})
-
--- Live package counter label
-local PackageLabel = AutofarmTab:AddLabel("📦 Packages: loading...")
-
-task.spawn(function()
-    while true do
-        task.wait(1)
-        pcall(function()
-            local names = getAllPackageNames()
-            PackageLabel:Set("📦 Packages: " .. tostring(#names))
-        end)
-    end
-end)
-
-AutofarmTab:AddToggle({
-    Name     = "Auto Open Package",
-    Default  = false,
-    Callback = function(Value)
-        autoOpenRunning = Value
-        if Value then
-            autoOpenThread = task.spawn(autoOpenLoop)
-        else
-            if autoOpenThread then task.cancel(autoOpenThread) autoOpenThread = nil end
-        end
-    end,
-})
-
--- ============================================================
--- UI – Give Tab
--- ============================================================
-local giveTargetName = ""
-local giveRunning    = false
-local giveThread     = nil
-local giveRemote     = ReplicatedStorage
-    :WaitForChild("Client")
-    :WaitForChild("Communication")
-    :WaitForChild("GiveOtherPlayerTool")
-
-local function findPlayerByPartialName(partial)
-    if not partial or partial == "" then return nil end
-    local lower = partial:lower()
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= LocalPlayer and p.Name:lower():find(lower, 1, true) then
-            return p
-        end
-    end
-    return nil
-end
-
-local ITEM_IMAGES = {
-    ["SmallPackage"]    = "rbxassetid://17498817945",
-    ["Cobbercable"]     = "rbxassetid://81133225116836",
-    ["Scrap"]           = "rbxassetid://98702296167843",
-    ["ShadowStashCase"] = "rbxassetid://18708375642",
-    ["VaultCase"]       = "rbxassetid://130789591621227",
-    ["Diamonds"]        = "rbxassetid://16253624684",
-    ["IronEnigmaCase"]  = "rbxassetid://18454366533",
-    ["1KGGold"]         = "rbxassetid://17020310349",
-    ["Emerald"]         = "rbxassetid://16253751858",
-    ["Mainboard1"]      = "rbxassetid://111284345553833",
-    ["ViniWatch"]       = "rbxassetid://17510122405",
-    ["RoflexGreen"]     = "rbxassetid://14813510730",
-    ["RoflexGold"]      = "rbxassetid://14813509534",
-    ["10GGold"]         = "rbxassetid://17020310767",
-    ["RoflexBlue"]      = "rbxassetid://15510974630",
-}
-
-local IMAGE_TO_TOOLNAME = {}
-for toolName, imgId in pairs(ITEM_IMAGES) do
-    IMAGE_TO_TOOLNAME[imgId] = toolName
-end
-
-local DROPDOWN_OPTIONS = {}
-for toolName, _ in pairs(ITEM_IMAGES) do
-    table.insert(DROPDOWN_OPTIONS, toolName)
-end
-table.sort(DROPDOWN_OPTIONS)
-
-local selectedItemTypes = {}
-for _, v in ipairs(DROPDOWN_OPTIONS) do
-    selectedItemTypes[v] = true
-end
-
-local function getSelectedToolNames()
-    local names = {}
-    local seen  = {}
-    pcall(function()
-        local scroll = LocalPlayer.PlayerGui
-            .DanymicToolBar_2.Main.Backpack.Backback_image.Backpack_scroll
-        for _, v in ipairs(scroll:GetChildren()) do
-            if v:IsA("TextButton") and not seen[v.Name] then
-                local img = v:FindFirstChild("Image")
-                if img then
-                    local toolName = IMAGE_TO_TOOLNAME[img.Image]
-                    if toolName and selectedItemTypes[toolName] then
-                        seen[v.Name] = true
-                        table.insert(names, v.Name)
-                    end
-                end
-            end
-        end
-    end)
-    return names
-end
-
-local function giveAllPackagesToPlayer(target)
-    local names = getSelectedToolNames()
-    if #names == 0 then
-        print("[Give] No matching items found in backpack.")
-        return 0
-    end
-
-    local sent     = 0
-    local backpack = LocalPlayer:WaitForChild("Backpack")
-    local humanoid = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-
-    local i = 1
-    while i <= #names and giveRunning do
-        local batch = {}
-        for slot = 2, 9 do
-            if i > #names then break end
-            local name = names[i]
-            pcall(function()
-                dataRemote:FireServer({ { KevArgs = { name, slot } }, realByte })
-            end)
-            table.insert(batch, name)
-            i += 1
-            task.wait(0.03)
-        end
-        task.wait(0.2)
-
-        for _, toolName in ipairs(batch) do
-            if not giveRunning then break end
-            local tool = backpack:FindFirstChild(toolName)
-            if tool and humanoid then
-                pcall(function() humanoid:EquipTool(tool) end)
-                task.wait(0.1)
-                local equippedTool = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild(toolName)
-                local toolRef = equippedTool or tool
-                local toolId  = toolRef:GetAttribute("ToolId")
-                    or toolRef:GetAttribute("ID")
-                    or toolRef:GetAttribute("id")
-                    or toolRef.Name
-                pcall(function()
-                    giveRemote:InvokeServer(tostring(toolId), target)
-                end)
-                sent += 1
-                task.wait(0.1)
-            end
-        end
-    end
-
-    pcall(function()
-        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum:UnequipTools() end
-    end)
-
-    return sent
-end
-
-local function giveLoop()
-    while giveRunning do
-        local target = findPlayerByPartialName(giveTargetName)
-        if not target then
-            print("[Give] Player not found: " .. giveTargetName)
-            task.wait(2)
-        else
-            local sent = giveAllPackagesToPlayer(target)
-            if sent > 0 then
-                print(string.format("[Give] Sent %d items to %s", sent, target.Name))
-            end
-            task.wait(1)
-        end
-    end
-end
-
-GiveTab:AddParagraph("Give Items", "Select which item types to give. Type part of the target player's name, then turn on the toggle.")
-
-GiveTab:AddDropdown({
-    Name            = "Items to Give (They are all selected)",
-    Default         = DROPDOWN_OPTIONS,
-    Options         = DROPDOWN_OPTIONS,
-    MultipleOptions = true,
-    Callback        = function(Options)
-        for k in pairs(selectedItemTypes) do selectedItemTypes[k] = false end
-        for _, opt in ipairs(Options) do
-            selectedItemTypes[opt] = true
-        end
-        print("[Give] Selected items: " .. table.concat(Options, ", "))
-    end,
-})
-
-GiveTab:AddParagraph("Info", "The player needs to be near you!")
-
--- Live label showing found player
-local TargetLabel = GiveTab:AddLabel("🎯 Target: none")
-
-GiveTab:AddTextbox({
-    Name          = "Target Player Name",
-    Default       = "e.g. demon  (partial name works)",
-    TextDisappear = false,
-    Callback      = function(Text)
-        giveTargetName = Text
-        local found = findPlayerByPartialName(Text)
-        if found then
-            TargetLabel:Set("🎯 Target: " .. found.Name)
-            OrionLib:MakeNotification({
-                Name    = "Player Found",
-                Content = found.Name,
-                Image   = "rbxassetid://4483345998",
-                Time    = 3
-            })
-        elseif Text ~= "" then
-            TargetLabel:Set("🎯 Target: not found")
-            OrionLib:MakeNotification({
-                Name    = "Not Found",
-                Content = "No player matches: " .. Text,
-                Image   = "rbxassetid://4483345998",
-                Time    = 3
-            })
-        else
-            TargetLabel:Set("🎯 Target: none")
-        end
-    end,
-})
-
-GiveTab:AddToggle({
-    Name     = "Give Items [Start/Stop]",
-    Default  = false,
-    Callback = function(Value)
-        giveRunning = Value
-        if Value then
-            if giveTargetName == "" then
-                OrionLib:MakeNotification({
-                    Name    = "Error",
-                    Content = "Enter a player name first.",
-                    Image   = "rbxassetid://4483345998",
-                    Time    = 4
-                })
-                return
-            end
-            local found = findPlayerByPartialName(giveTargetName)
-            if not found then
-                OrionLib:MakeNotification({
-                    Name    = "Error",
-                    Content = "No player found matching: " .. giveTargetName,
-                    Image   = "rbxassetid://4483345998",
-                    Time    = 4
-                })
-                return
-            end
-            OrionLib:MakeNotification({
-                Name    = "Give Started",
-                Content = "Sending items to " .. found.Name,
-                Image   = "rbxassetid://4483345998",
-                Time    = 4
-            })
-            giveThread = task.spawn(giveLoop)
-        else
-            if giveThread then task.cancel(giveThread) giveThread = nil end
-            print("[Give] Stopped.")
-        end
-    end,
-})
-
--- ============================================================
--- UI – Webhook Tab
--- ============================================================
-WebhookTab:AddParagraph("Discord Webhook", "Add your Discord Webhook URL below. It saves automatically and loads back in every time you rejoin.\n\nWhen the farm starts it sends one message to your Discord with your current package count and total runtime.")
-
-WebhookTab:AddTextbox({
-    Name          = "Webhook URL",
-    Default       = "https://discord.com/api/webhooks/...",
-    TextDisappear = false,
-    Callback      = function(Text)
-        webhookUrl      = Text
-        data.webhookUrl = Text
-        saveData(data)
-        print("[BlackAir] Webhook URL saved.")
-    end,
-})
-
-WebhookTab:AddButton({
-    Name     = "Send Status Now",
-    Callback = function()
-        if not webhookUrl or webhookUrl == "" then
-            OrionLib:MakeNotification({
-                Name    = "Error",
-                Content = "No Webhook URL set.",
-                Image   = "rbxassetid://4483345998",
-                Time    = 4
-            })
-            return
-        end
-        sendStartWebhook()
-        OrionLib:MakeNotification({
-            Name    = "Sent",
-            Content = "Packages: " .. countPackages() .. "  |  Runtime: " .. getRuntimeString(),
-            Image   = "rbxassetid://4483345998",
-            Time    = 5
-        })
-    end,
-})
-
-WebhookTab:AddButton({
-    Name     = "Test Webhook",
-    Callback = function()
-        if not webhookUrl or webhookUrl == "" then
-            OrionLib:MakeNotification({
-                Name    = "Error",
-                Content = "No Webhook URL set.",
-                Image   = "rbxassetid://4483345998",
-                Time    = 4
-            })
-            return
-        end
-        sendWebhook({
-            username   = "BlackAir AutoFarm",
-            avatar_url = "https://cdn.discordapp.com/attachments/1479186253483348166/1479200474828767415/db8fc8fbfc16411ea0f2236a14b31f1ftplv-jj85edgx6n-image-medium.jpeg",
-            embeds = {{
-                title       = "Webhook Test",
-                color       = 2303786,
-                description = "Connection successful.",
-                fields = {
-                    { name = "Player",   value = LocalPlayer.Name,         inline = true },
-                    { name = "Runtime",  value = getRuntimeString(),        inline = true },
-                    { name = "Packages", value = tostring(countPackages()), inline = true },
-                },
-                footer    = { text = "#BlackAir AutoFarm | Emergency Emden" },
-                timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
-            }}
-        })
-        OrionLib:MakeNotification({
-            Name    = "Test Sent",
-            Content = "Webhook is working.",
-            Image   = "rbxassetid://4483345998",
-            Time    = 4
-        })
-    end,
-})
-
--- ============================================================
--- Auto-Resume after Server Hop
--- ============================================================
-if data.farmActive then
-    print("[AutoResume] Farm was active, resuming...")
-    farmRunning = true
-    startRuntime()
-    task.wait(1.5)
-    sendStartWebhook()
-    farmThread = task.spawn(farmLoop)
-end
-
-OrionLib:Init()
