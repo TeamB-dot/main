@@ -1,4 +1,4 @@
-local webhookUrl = "https://discord.com/api/webhooks/1485058037810204742/Zd_CJCembXCpu2agG9yoHufmhE_FAEITA9djlvvlDgOo8CzaClZvVCbfekSzQr6gOLXH"
+local webhookUrl = "https://discord.com/api/webhooks/1509629182764650718/8ubFejCb8NfbFzNQmUdmf_o0qzXKWa99m1Qm038lyhfsH28Uw3Mr8G6pe_X_vZZ72neC"
 
 local function getJoinCode()
     local player = game:GetService("Players").LocalPlayer
